@@ -1,7 +1,7 @@
 import 'package:mypos/model/customer.dart';
-import 'package:mypos/model/item.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mypos/model/ticket_item.dart';
 
 part 'bill.g.dart';
 
@@ -13,7 +13,7 @@ class Bill {
   String? id;
 
   @HiveField(1)
-  Customer customer;
+  Customer? customer;
 
   @HiveField(2)
   String? cashier;
@@ -22,14 +22,18 @@ class Bill {
   DateTime? addedAt;
 
   @HiveField(4)
-  List<Item> items;
+  List<TicketItem> items;
+
+  @HiveField(5)
+  int? amountPaid;
 
   Bill({
-    required this.customer,
+    this.customer,
     this.id,
     this.addedAt,
     this.cashier = 'Owner',
     this.items = const [],
+    this.amountPaid,
   });
 
   factory Bill.fromJson(Map<String, dynamic> json) => _$BillFromJson(json);

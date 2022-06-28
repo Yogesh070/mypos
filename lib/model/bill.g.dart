@@ -21,14 +21,15 @@ class BillAdapter extends TypeAdapter<Bill> {
       id: fields[0] as String?,
       addedAt: fields[3] as DateTime?,
       cashier: fields[2] as String?,
-      items: (fields[4] as List).cast<Item>(),
+      items: (fields[4] as List).cast<TicketItem>(),
+      amountPaid: fields[5] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Bill obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class BillAdapter extends TypeAdapter<Bill> {
       ..writeByte(3)
       ..write(obj.addedAt)
       ..writeByte(4)
-      ..write(obj.items);
+      ..write(obj.items)
+      ..writeByte(5)
+      ..write(obj.amountPaid);
   }
 
   @override
@@ -64,9 +67,10 @@ Bill _$BillFromJson(Map<String, dynamic> json) => Bill(
           : DateTime.parse(json['addedAt'] as String),
       cashier: json['cashier'] as String? ?? 'Owner',
       items: (json['items'] as List<dynamic>?)
-              ?.map((e) => Item.fromJson(e as Map<String, dynamic>))
+              ?.map((e) => TicketItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      amountPaid: json['amountPaid'] as int?,
     );
 
 Map<String, dynamic> _$BillToJson(Bill instance) {
@@ -83,5 +87,6 @@ Map<String, dynamic> _$BillToJson(Bill instance) {
   writeNotNull('cashier', instance.cashier);
   writeNotNull('addedAt', instance.addedAt?.toIso8601String());
   val['items'] = instance.items;
+  writeNotNull('amountPaid', instance.amountPaid);
   return val;
 }
