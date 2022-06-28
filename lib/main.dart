@@ -7,6 +7,7 @@ import 'package:mypos/controllers/notificationcontroller.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/controllers/settings_controller.dart';
 import 'package:mypos/controllers/sidenav_controller.dart';
+import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/addon.dart';
 import 'package:mypos/model/bill.dart';
 import 'package:mypos/model/category.dart';
@@ -66,6 +67,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ProductController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TicketController(),
         ),
       ],
       child: MaterialApp.router(
