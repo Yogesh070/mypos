@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/item.dart';
 import 'package:mypos/utils/constant.dart';
+import 'package:provider/provider.dart';
 
 class AnimateItemGrid extends StatelessWidget {
   final GlobalKey imageGlobalKey = GlobalKey();
@@ -42,8 +44,8 @@ class AnimateItemGrid extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onClick(imageGlobalKey);
-        // Provider.of<ItemsController>(context, listen: false)
-        //     .addProductToCart(item);
+        Provider.of<TicketController>(context, listen: false)
+            .addProductToCart(item);
         // Provider.of<ItemsController>(context, listen: false).sum();
       },
       child: Container(

@@ -1,19 +1,25 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:mypos/controllers/category_controller.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/controllers/settings_controller.dart';
 import 'package:mypos/controllers/sidenav_controller.dart';
+import 'package:mypos/model/category.dart';
 import 'package:mypos/screens/addon/addon_screen.dart';
 import 'package:mypos/screens/category/category_screen.dart';
 import 'package:mypos/screens/customer/customer_screen.dart';
 import 'package:mypos/screens/home/components/items_grid_view.dart';
 import 'package:mypos/screens/home/components/sidemenu.dart';
+import 'package:mypos/screens/item/itemlist_screen.dart';
+import 'package:mypos/screens/open%20ticket/components/ticket_container.dart';
+import 'package:mypos/screens/open%20ticket/ticketedit_screen.dart';
 import 'package:mypos/screens/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/item.dart';
+import 'package:mypos/screens/reciept/reciept_screen.dart';
 import 'package:mypos/screens/settings/settings.dart';
 import 'package:mypos/utils/addtocartanimation/add_to_cart_animation.dart';
 import 'package:mypos/utils/addtocartanimation/add_to_cart_icon.dart';
@@ -35,13 +41,8 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int selectedIndex = 0;
-  final List<String> items = [
-    'All Items',
-    'Discount',
-    'Drinks',
-    'Snacks',
-    'Alcohol'
-  ];
+
+  late List<Category> items;
   final List<MenuOptions> menuOptions = [
     MenuOptions(title: 'Menu', icon: Icons.fastfood),
     MenuOptions(title: 'Bills', icon: Icons.line_style),
@@ -65,16 +66,39 @@ class _HomepageState extends State<Homepage> {
   late FocusNode myfocusnode;
   int searchflex = 1;
   int itemsFlex = 4;
-  late Future<List<Item>> futureItem;
 
-//animation for
   GlobalKey<CartIconKey> gkItem = GlobalKey<CartIconKey>();
   late Function(GlobalKey) runAddToCardAnimation;
+
+  List<String> _filterOptions = ['All Items'];
+  List<Item> _itemsBasedOnCategory = [];
+
+  void filterItemsBasedOnCategory(String category) {
+    setState(() {
+      _itemsBasedOnCategory =
+          Provider.of<ProductController>(context, listen: false)
+              .allItem
+              .where((element) => element.categories!.contains(category))
+              .toList();
+    });
+  }
+
+  void getFilterOptions() async {
+    List<Category> allCategoryz =
+        await Provider.of<CategoryController>(context, listen: false)
+            .getCategories();
+    setState(() {
+      _filterOptions = [
+        dropdownValue,
+        ...allCategoryz.map((e) => e.name).toList()
+      ];
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    // futureItem =
+    getFilterOptions();
     Provider.of<ProductController>(context, listen: false).getAllItems();
     myfocusnode = FocusNode();
   }
@@ -198,9 +222,9 @@ class _HomepageState extends State<Homepage> {
                 toolbarHeight: 80,
                 title: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(MaterialPageRoute(
-                    //   builder: (context) => const TicketEditScreen(),
-                    // ));
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const TicketEditScreen(),
+                    ));
                   },
                   child: Row(
                     children: [
@@ -246,16 +270,20 @@ class _HomepageState extends State<Homepage> {
               case 0:
                 return newHome(media);
               case 1:
-              // return const RecieptScreen();
+                return const RecieptScreen();
               case 2:
-              // return const ItemListScreen();
+                return const ItemScreen();
               case 3:
                 return const CategoryScreen();
               case 4:
                 return const AddonListScreen();
               case 5:
+                return Text('Notification');
+
               // return const DropdownNotificationCreditor();
               case 6:
+                return Text('ADD Notification');
+
               // return const AddNotification();
               case 7:
                 return const Settings();
@@ -291,8 +319,8 @@ class _HomepageState extends State<Homepage> {
               (media.width < 600)
                   ? Container(
                       margin: const EdgeInsets.all(25),
-                      // child: const TicketContainer(),
-                      child: Text('Ticket Container'),
+                      child: const TicketContainer(),
+                      // child: Text('Ticket Container'),
                     )
                   : Container(),
               Container(
@@ -354,11 +382,12 @@ class _HomepageState extends State<Homepage> {
                               ),
                               iconSize: 35,
                               onChanged: (String? newValue) {
+                                filterItemsBasedOnCategory(newValue!);
                                 setState(() {
-                                  dropdownValue = newValue!;
+                                  dropdownValue = newValue;
                                 });
                               },
-                              items: items
+                              items: _filterOptions
                                   .map((values) => DropdownMenuItem(
                                         child: Text(
                                           values,
@@ -484,6 +513,8 @@ class _HomepageState extends State<Homepage> {
                             List<Item> _allItems;
                             if (_controller.text.isNotEmpty) {
                               _allItems = _searchedItems;
+                            } else if (dropdownValue != 'All Items') {
+                              _allItems = _itemsBasedOnCategory;
                             } else {
                               _allItems = Provider.of<ProductController>(
                                       context,
