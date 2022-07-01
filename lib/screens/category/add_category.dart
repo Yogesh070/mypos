@@ -64,8 +64,8 @@ class _AddCategoryState extends State<AddCategory> {
                   name: _categoryName.text,
                   color: _categoryColors[selectedColorIndex],
                 );
-                category.id = widget.category!.id;
                 if (widget.forEdit) {
+                  category.id = widget.category!.id;
                   // if (widget.category!.color.trim() !=
                   //     _categoryColors[selectedColorIndex]) {
                   //   category.color = _categoryColors[selectedColorIndex];
