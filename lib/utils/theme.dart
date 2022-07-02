@@ -16,6 +16,8 @@ class MyPosTheme {
       ),
       primaryColor: kDefaultGreen,
       scaffoldBackgroundColor: kDefaultBackgroundColor,
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: kDefaultGreen, foregroundColor: Colors.white),
     );
   }
 }
