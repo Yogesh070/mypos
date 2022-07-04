@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   getMyBusinsss(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     http.Response res = await http.get(
-        Uri.parse('http://3.17.156.110/api/v1/business/my'),
+        Uri.parse('https://api.buzz-test.tk/api/v1/business/my'),
         headers: {'Authorization': 'Bearer $token'});
     lastResponse = res;
     print('response body for bussiness' + res.body);
