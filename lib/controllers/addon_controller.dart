@@ -72,9 +72,10 @@ class AddonController extends ChangeNotifier {
 
       if (res.statusCode == 200) {
         Addon toPushAddon = Addon.fromJson(jsonDecode(res.body)['data']);
-        toPushAddon.isSynced = true;
-        addAddonInHive(toPushAddon, toPushAddon.id);
-        _addon = addonBox.values.toList();
+        // toPushAddon.isSynced = true;
+        // addAddonInHive(toPushAddon, toPushAddon.id);
+        // _addon = addonBox.values.toList();
+        _addon.add(toPushAddon);
         notifyListeners();
       }
     } on SocketException catch (e) {
@@ -135,8 +136,11 @@ class AddonController extends ChangeNotifier {
         },
       );
       print(res.body);
-      // _addon.add(addon);
-      // notifyListeners();
+      if (res.statusCode == 200) {
+        _addon[_addon.indexWhere((element) => element.id == addon.id)] =
+            Addon.fromJson(jsonDecode(res.body)['data']);
+        notifyListeners();
+      }
       // addAddonInHive(addon);
     } on DioError catch (e) {
       throw Exception(e);
@@ -162,7 +166,7 @@ class AddonController extends ChangeNotifier {
 
       if (res.statusCode == 200) {
         _addon.removeWhere((element) => element.id == id);
-        deleteAddonInHive(id);
+        // deleteAddonInHive(id);
         notifyListeners();
       }
     } on DioError catch (e) {

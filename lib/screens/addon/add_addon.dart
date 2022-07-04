@@ -31,7 +31,7 @@ class _AddAddonState extends State<AddAddon> {
     if (widget.forEdit && widget.addon != null) {
       _name.text = widget.addon!.name;
       _price.text = widget.addon!.price.toString();
-      _description.text = widget.addon!.name;
+      _description.text = widget.addon!.description;
       _maxAvilable.text = widget.addon!.maxAvailable.toString();
     }
     super.initState();
@@ -71,10 +71,11 @@ class _AddAddonState extends State<AddAddon> {
                   if (await checkConnectivity()) {
                     Provider.of<AddonController>(context, listen: false)
                         .addAddon(toAdd);
-                  } else {
-                    Provider.of<AddonController>(context, listen: false)
-                        .addAddonOnOffline(toAdd);
                   }
+                  //  else {
+                  //   Provider.of<AddonController>(context, listen: false)
+                  //       .addAddonOnOffline(toAdd);
+                  // }
                 } else {
                   Provider.of<AddonController>(context, listen: false)
                       .updateAddon(
@@ -118,7 +119,10 @@ class _AddAddonState extends State<AddAddon> {
                   textEditingController: _price,
                   keyboardType: TextInputType.number,
                   validator: (String? val) {
-                    if (val!.isEmpty) {
+                    if (double.tryParse(val!) == null) {
+                      return 'Enter Valid Price';
+                    }
+                    if (val.isEmpty) {
                       return 'Cannot be empty';
                     }
                     return null;
@@ -138,6 +142,12 @@ class _AddAddonState extends State<AddAddon> {
                   hintText: 'Max Avilable',
                   textEditingController: _maxAvilable,
                   keyboardType: TextInputType.number,
+                  validator: (val) {
+                    if (int.tryParse(val!) == null && val.isNotEmpty) {
+                      return 'Enter Valid Price';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),

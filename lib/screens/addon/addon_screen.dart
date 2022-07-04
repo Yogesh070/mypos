@@ -108,25 +108,29 @@ class _AddonListScreenState extends State<AddonListScreen> {
                                 ),
                               ),
                               onDismissed: (direction) async {
-                                if (!await checkConnectivity() &&
-                                    !addon.isSynced!) {
-                                  Provider.of<AddonController>(context,
-                                          listen: false)
-                                      .deleteAddonInHive(addon.id);
-                                } else if (await checkConnectivity() &&
-                                    !addon.isSynced!) {
-                                  Provider.of<AddonController>(context,
-                                          listen: false)
-                                      .deleteAddonInHive(addon.id);
-                                } else if (!await checkConnectivity() &&
-                                    addon.isSynced!) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Cannot delete now'),
-                                    ),
-                                  );
-                                  //Delete synced addon when no internet is avilable
-                                } else {
+                                if (!await checkConnectivity()) {
+                                  debugPrint("No internet");
+                                }
+                                // if (!await checkConnectivity() &&
+                                //     !addon.isSynced!) {
+                                //   Provider.of<AddonController>(context,
+                                //           listen: false)
+                                //       .deleteAddonInHive(addon.id);
+                                // } else if (await checkConnectivity() &&
+                                //     !addon.isSynced!) {
+                                //   Provider.of<AddonController>(context,
+                                //           listen: false)
+                                //       .deleteAddonInHive(addon.id);
+                                // } else if (!await checkConnectivity() &&
+                                //     addon.isSynced!) {
+                                //   ScaffoldMessenger.of(context).showSnackBar(
+                                //     const SnackBar(
+                                //       content: Text('Cannot delete now'),
+                                //     ),
+                                //   );
+                                //   //Delete synced addon when no internet is avilable
+                                // }
+                                else {
                                   Provider.of<AddonController>(context,
                                           listen: false)
                                       .deleteAddon(addon.id);
