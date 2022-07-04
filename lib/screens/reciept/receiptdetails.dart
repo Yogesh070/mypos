@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
 import 'package:mypos/utils/constant.dart';
+import 'package:provider/provider.dart';
 
 class ReceiptDetails extends StatelessWidget {
   final Bill bill;
 
   const ReceiptDetails({Key? key, required this.bill}) : super(key: key);
+
+  String calculateGrandTotal() {
+    double total = 0;
+    for (var element in bill.items) {
+      total = total + (element.item!.price * element.quantity);
+    }
+    return (total + 0.13 * total).toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,9 +111,10 @@ class ReceiptDetails extends StatelessWidget {
                   .toList()),
           const SizedBox(height: 16),
           divider,
-          const CustomRow(
+          CustomRow(
             label: 'Total',
-            trailing: 'Rs 3000',
+            trailing:
+                'Rs. ${Provider.of<TicketController>(context).calculateTotal(bill.items)}',
           ),
           const CustomRow(
             label: 'Discount',
@@ -117,11 +128,11 @@ class ReceiptDetails extends StatelessWidget {
             label: 'Service Charge',
             trailing: '10%',
           ),
-          const CustomRow(
+          CustomRow(
             label: 'Grand Total',
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            trailing: 'Rs 1832.7',
+            trailing: 'Rs ${calculateGrandTotal()}',
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),

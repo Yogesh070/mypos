@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:mypos/model/bill.dart';
 import 'package:mypos/model/item.dart';
@@ -6,12 +8,13 @@ import 'package:mypos/utils/boxes.dart';
 
 class TicketController extends ChangeNotifier {
   List<Bill> bills = [];
+  List<Bill> openTickets = [];
 
   void addToBill(Bill bill) {
     bills.add(bill);
     notifyListeners();
-    // final billBox = Boxes.getBills();
-    // billBox.put(bill.id, bill);
+    addBillInHive(bill);
+    clearTicket();
   }
 
   List<Bill> getBills() {
@@ -21,10 +24,35 @@ class TicketController extends ChangeNotifier {
     return bills;
   }
 
+  void addBillInHive(Bill bill) async {
+    print('Trying to add in hive');
+    print(bill.toJson());
+    final billBox = Boxes.getBills();
+    await billBox.put(bill.id, bill);
+  }
+
+  List<Bill> getBillsFromHive() {
+    final billBox = Boxes.getBills();
+    return billBox.values.toList();
+  }
+
+  void addToOpenTickets(Bill bill) {
+    openTickets.add(bill);
+    notifyListeners();
+    addBillInHive(bill);
+  }
+
+  List<Bill> getOpenTickets() {
+    final billBox = Boxes.getBills();
+    openTickets = billBox.values.toList();
+    notifyListeners();
+    return openTickets;
+  }
+
   final GlobalKey<AnimatedListState> openTicketKey = GlobalKey();
 
 //Ticket ko kam yeta
-  final List<TicketItem> _ticketList = [];
+  List<TicketItem> _ticketList = [];
   List<TicketItem> get ticketList => _ticketList;
 
   void addProductToCart(Item item) {
@@ -40,8 +68,15 @@ class TicketController extends ChangeNotifier {
     print(_ticketList);
   }
 
+  void removeItemFromCart(String id) {
+    _ticketList.removeWhere((ticket) => ticket.item!.id == id);
+    notifyListeners();
+  }
+
   void clearTicket() {
-    _ticketList.clear();
+    print('clearing tickets');
+    // _ticketList.clear();
+    _ticketList = [];
     notifyListeners();
   }
 

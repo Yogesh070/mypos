@@ -6,7 +6,8 @@ import 'package:mypos/model/ticket_item.dart';
 part 'bill.g.dart';
 
 @HiveType(typeId: 5)
-@JsonSerializable(includeIfNull: false)
+// @JsonSerializable(includeIfNull: false)
+@JsonSerializable()
 class Bill {
   @HiveField(0)
   @JsonKey(name: '_id')
@@ -27,14 +28,21 @@ class Bill {
   @HiveField(5)
   int? amountPaid;
 
-  Bill({
-    this.customer,
-    this.id,
-    this.addedAt,
-    this.cashier = 'Owner',
-    this.items = const [],
-    this.amountPaid,
-  });
+  @HiveField(6)
+  bool? isPaid;
+
+  @HiveField(7)
+  String? email;
+
+  Bill(
+      {this.customer,
+      this.id,
+      this.addedAt,
+      this.cashier = 'Owner',
+      this.items = const [],
+      this.amountPaid,
+      this.isPaid = false,
+      this.email});
 
   factory Bill.fromJson(Map<String, dynamic> json) => _$BillFromJson(json);
   Map<String, dynamic> toJson() => _$BillToJson(this);

@@ -8,74 +8,101 @@ import 'receiptdetails.dart';
 
 import 'package:provider/provider.dart';
 
-class RecieptScreen extends StatelessWidget {
+class RecieptScreen extends StatefulWidget {
   const RecieptScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RecieptScreen> createState() => _RecieptScreenState();
+}
+
+class _RecieptScreenState extends State<RecieptScreen> {
+  late List<Bill> _allBills;
+  final TextEditingController _searchController = TextEditingController();
+  List<Bill> searchedBills = [];
+  @override
+  void initState() {
+    super.initState();
+    _allBills = Provider.of<TicketController>(context, listen: false)
+        .getBillsFromHive();
+    _allBills.sort(((a, b) => a.addedAt!.compareTo(b.addedAt!)));
+    _allBills.where((element) => element.isPaid!);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF4F4F4),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint("Receipt Added");
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: const Color(0xff30B700),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     debugPrint("Receipt Added");
+      //   },
+      //   child: const Icon(
+      //     Icons.add,
+      //     color: Colors.white,
+      //   ),
+      //   backgroundColor: const Color(0xff30B700),
+      // ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: Row(
-              children: const [
+              children: [
                 Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Search',
                       suffixIcon: Icon(Icons.search),
                     ),
+                    controller: _searchController,
+                    onChanged: (val) {
+                      setState(
+                        () {
+                          searchedBills = _allBills
+                              .where((element) => element.items.any((element) =>
+                                  element.item!.name
+                                      .toLowerCase()
+                                      .contains(val.toLowerCase())))
+                              .toList();
+                        },
+                      );
+                    },
                   ),
                 ),
-                Icon(Icons.sort)
+                const Icon(Icons.sort)
               ],
             ),
           ),
           const SizedBox(height: 20),
           Expanded(
-            child: ListView(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 30,
-                  alignment: Alignment.centerLeft,
-                  color: const Color(0xffE0E0E0),
-                  child: const Text('Tuesday, 29 June'),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      Provider.of<TicketController>(context, listen: false)
-                          .bills
-                          .map(
-                            (bill) => BillCard(
-                              index: Provider.of<TicketController>(context,
-                                          listen: false)
-                                      .bills
-                                      .indexOf(bill) +
-                                  1,
-                              bill: bill,
-                            ),
-                          )
-                          .toList(),
-                ),
-              ],
-            ),
-          )
+            child: ListView.builder(
+                itemCount: (_searchController.text.isEmpty)
+                    ? _allBills.where((element) => element.isPaid!).length
+                    : searchedBills.length,
+                itemBuilder: (context, index) {
+                  Bill bill;
+                  if (_searchController.text.isNotEmpty) {
+                    bill = searchedBills[index];
+                  } else {
+                    bill = _allBills
+                        .where((element) => element.isPaid!)
+                        .toList()[index];
+                  }
+                  return BillCard(
+                    bill: bill,
+                    index: index,
+                  );
+                }),
+          ),
+          //   Container(
+          //     width: double.infinity,
+          //     height: 30,
+          //     alignment: Alignment.centerLeft,
+          //     color: const Color(0xffE0E0E0),
+          //     child: const Text('Tuesday, 29 June'),
+          //     padding: const EdgeInsets.symmetric(horizontal: 16),
+          //   ),
         ],
       ),
     );
@@ -107,7 +134,7 @@ class BillCard extends StatelessWidget {
             style: const TextStyle(fontSize: 12, color: Colors.black),
           ),
           trailing: Text(
-            Provider.of<TicketController>(context).calculateTotal(bill.items),
+            'Rs. ${Provider.of<TicketController>(context).calculateTotal(bill.items)}',
             style: const TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 14, color: Colors.black),
           ),

@@ -5,6 +5,7 @@ import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/controllers/settings_controller.dart';
 import 'package:mypos/controllers/sidenav_controller.dart';
+import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/category.dart';
 import 'package:mypos/screens/addon/addon_screen.dart';
 import 'package:mypos/screens/category/category_screen.dart';
@@ -246,8 +247,7 @@ class _HomepageState extends State<Homepage> {
                           Positioned(
                             key: gkItem,
                             child: Text(
-                              // '${Provider.of<ItemsController>(context).ticketList.length}',
-                              'ss',
+                              '${Provider.of<TicketController>(context).bills.length}',
                               style: const TextStyle(color: Colors.white),
                             ),
                             top: 8,

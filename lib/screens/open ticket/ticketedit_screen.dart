@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/ticket_item.dart';
+import 'package:mypos/screens/payment/payment_method.dart';
 import 'package:mypos/screens/widgets/menu_items.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,7 @@ class TicketEditScreen extends StatefulWidget {
 }
 
 class _TicketEditScreenState extends State<TicketEditScreen> {
-  late final List<TicketItem> ticketList;
+  // late final List<TicketItem> ticketList;
   // @override
   // void initState() {
   //   ticketList =
@@ -92,49 +93,32 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 16),
-            AnimatedList(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              // key:  Provider.of<TicketController>(context, listen: false).itemKey,
-              initialItemCount:
-                  Provider.of<TicketController>(context, listen: false)
-                      .ticketList
-                      .length,
-              itemBuilder: (context, index, animation) {
-                TicketItem item =
-                    Provider.of<TicketController>(context, listen: false)
-                        .ticketList[index];
-                return FadeTransition(
-                  opacity: animation,
-                  // child: _builtAddItemList( Provider.of<TicketController>(context, listen: false), index, context),
-                  child: MenuItemText(
-                    itemName: item.item!.name,
-                    itemQuantity: item.quantity,
-                    itemRate: item.item!.price,
-                  ),
-                );
-              },
-            ),
-            // ...List.generate(items.ticketList.length, (index) {
-            //   final ticket = items.ticketList[index];
-            //   return MenuItemText(
-            //       onEdit: (context) {
-            //         Navigator.push(
-            //             context,
-            //             MaterialPageRoute(
-            //               builder: (context) => EditQuantityScreen(
-            //                 ticektItem: ticket,
-            //                 index: index,
-            //               ),
-            //             ));
-            //       },
-            //       onDelete: (context) {
-            //         items.removeAtIndex(ticket);
-            //       },
-            //       itemName: '${ticket.item!.name}',
-            //       itemQuantity: '${ticket.quantity}',
-            //       itemRate: '${ticket.item!.price}');
-            // }),
+            Provider.of<TicketController>(context, listen: false)
+                    .ticketList
+                    .isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount:
+                        Provider.of<TicketController>(context, listen: false)
+                            .ticketList
+                            .length,
+                    itemBuilder: (context, index) {
+                      TicketItem item =
+                          Provider.of<TicketController>(context, listen: false)
+                              .ticketList[index];
+                      return MenuItemText(
+                        itemName: item.item!.name,
+                        itemQuantity: item.quantity,
+                        itemRate: item.item!.price,
+                        onDelete: (context) {
+                          Provider.of<TicketController>(context, listen: false)
+                              .removeItemFromCart(item.item!.id!);
+                        },
+                      );
+                    },
+                  )
+                : const Text('No items'),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Divider(
@@ -155,7 +139,9 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                       ? 'Rs. 0.0'
                       : 'Rs. ${Provider.of<TicketController>(context, listen: false).calculateTotal(Provider.of<TicketController>(context, listen: false).ticketList)}',
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -187,16 +173,9 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                       if (Provider.of<TicketController>(context, listen: false)
                           .ticketList
                           .isNotEmpty) {
+                        toAddBill.customer = null;
                         Provider.of<TicketController>(context, listen: false)
                             .addToBill(toAddBill);
-
-                        print(toAddBill.toJson());
-
-                        // print( Provider.of<TicketController>(context, listen: false).ticketList.map((e) => e.item!.name));
-
-                        print(Provider.of<TicketController>(context,
-                                listen: false)
-                            .bills);
                         if (Provider.of<CustomerController>(context,
                                     listen: false)
                                 .selectedCustomerForTicket !=
@@ -205,12 +184,13 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                                   listen: false)
                               .removeCustomerFromTicket();
                         }
-
-                        Provider.of<TicketController>(context, listen: false)
-                            .clearTicket();
-
-                        //  Provider.of<TicketController>(context, listen: false).total = 0;
-                        // Navigator.pop(context);
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Cannot save empty ticket!'),
+                          ),
+                        );
                       }
                     },
                   ),
@@ -220,26 +200,24 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                 ),
                 Expanded(
                   child: PrimaryButton(
-                    title: 'Procced to Pay',
+                    title: 'Proceed to Pay',
                     onPressed: () {
-                      // Navigator.of(context).push(MaterialPageRoute(
-                      //   builder: (context) => const PaymentMethod(),
-                      // ));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PaymentMethod(
+                            totalAmount: Provider.of<TicketController>(context,
+                                    listen: false)
+                                .calculateTotal(Provider.of<TicketController>(
+                                        context,
+                                        listen: false)
+                                    .ticketList),
+                          ),
+                        ),
+                      );
                     },
                     padding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                 ),
-                // PrimaryButton(
-                //   title: 'Save Order',
-                //   onPressed: () {},
-                //   padding: EdgeInsets.symmetric(horizontal: 35, vertical: 20),
-                // ),
-
-                // PrimaryButton(
-                //   title: 'Procced to Pay',
-                //   onPressed: () {},
-                //   padding: EdgeInsets.symmetric(horizontal: 35, vertical: 20),
-                // ),
               ],
             ),
           ],

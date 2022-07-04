@@ -15,6 +15,7 @@ import 'package:mypos/model/customer.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mypos/model/item.dart';
+import 'package:mypos/model/ticket_item.dart';
 import 'package:mypos/router/router.dart';
 import 'package:mypos/utils/theme.dart';
 import 'package:provider/provider.dart';
@@ -29,11 +30,13 @@ void main() async {
   Hive.registerAdapter(AddonAdapter());
   Hive.registerAdapter(CustomerAdapter());
   Hive.registerAdapter(BillAdapter());
+  Hive.registerAdapter(TicketItemAdapter());
 
   await Hive.openBox<ItemAdapter>('items');
   await Hive.openBox<Category>('category');
   await Hive.openBox<Addon>('addon');
   await Hive.openBox<Bill>('bill');
+  await Hive.openBox<TicketItem>('ticketItem');
 
   runApp(const MyApp());
 }

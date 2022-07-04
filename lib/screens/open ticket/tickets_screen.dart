@@ -3,16 +3,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mypos/components/listile.dart';
+import 'package:mypos/controllers/ticket_controller.dart';
+import 'package:mypos/model/bill.dart';
 import 'package:mypos/screens/widgets/timeago.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 
-class TicketsScreen extends StatelessWidget {
+class TicketsScreen extends StatefulWidget {
   const TicketsScreen({Key? key}) : super(key: key);
 
   @override
+  State<TicketsScreen> createState() => _TicketsScreenState();
+}
+
+class _TicketsScreenState extends State<TicketsScreen> {
+  late List<Bill> _openTickets;
+  @override
+  void initState() {
+    super.initState();
+    _openTickets = Provider.of<TicketController>(context, listen: false)
+        .getBillsFromHive()
+        .where((element) => !element.isPaid!)
+        .toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // var _controller = Provider.of<TicketProvider>(context);
+    var _controller = Provider.of<TicketController>(context);
     return Scaffold(
       backgroundColor: const Color(0xffF4F4F4),
       appBar: AppBar(
@@ -92,81 +109,84 @@ class TicketsScreen extends StatelessWidget {
           const Divider(
             thickness: 1,
           ),
-          // Expanded(
-          //   child: AnimatedList(
-          //     key: _controller.openTicketKey,
-          //     initialItemCount: _controller.openTicketList.length,
-          //     itemBuilder: (context, index, animation) {
-          //       return FadeTransition(
-          //         opacity: animation,
-          //         child: _builtOpenTicket(_controller, index, context),
-          //       );
-          //     },
-          //   ),
-          // ),
+          Expanded(
+            child: AnimatedList(
+              key: _controller.openTicketKey,
+              initialItemCount: _openTickets.length,
+              itemBuilder: (context, index, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: _builtOpenTicket(_controller, index, context),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // Slidable _builtOpenTicket(
-  //     TicketProvider _controller, int index, BuildContext context) {
-  //   final openTicket = _controller.openTicketList[index];
-  //   return Slidable(
-  //     endActionPane: ActionPane(
-  //       extentRatio: 0.25,
-  //       motion: const ScrollMotion(),
-  //       children: [
-  //         SlidableAction(
-  //           autoClose: true,
-  //           icon: Icons.delete,
-  //           backgroundColor: Colors.red,
-  //           foregroundColor: Colors.white,
-  //           label: 'Delete',
-  //           onPressed: (context) {
-  //             _controller.dismisDelete(openTicket, index,
-  //                 _builtOpenTicket(_controller, index, context));
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               const SnackBar(
-  //                 duration: Duration(milliseconds: 600),
-  //                 content: Text('Ticket deleted Sucessfully'),
-  //                 backgroundColor: kDefaultGreen,
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //     child: Container(
-  //       decoration: const BoxDecoration(
-  //           border: Border(
-  //         bottom: BorderSide(color: kBorderColor, width: 1),
-  //       )),
-  //       child: TileListBox(
-  //         merge: _controller.openTicketList[index].ismerged == true
-  //             ? const Padding(
-  //                 padding: EdgeInsets.all(4.0),
-  //                 child: Text('Merge'),
-  //               )
-  //             : null,
-  //         isChecked: openTicket.isChecked!,
-  //         chechBoxCallback: (val) {
-  //           _controller.changeSwitchValue(index);
-  //         },
-  //         onTap: () {
-  //           // Navigator.push(
-  //           //   context,
-  //           //   MaterialPageRoute(builder: (context) => TicketDetail(index)),
-  //           // );
-  //         },
-  //         created: TimeAgo.timeAgoSinceDate(openTicket.created!),
-  //         taxTitle: '${openTicket.name}',
-  //         amount: '${openTicket.amount}',
-  //         iconData: Icons.person,
-  //       ),
-  //     ),
-  //   );
-  // }
+  Slidable _builtOpenTicket(
+      TicketController _controller, int index, BuildContext context) {
+    final openTicket = _openTickets[index];
+    return Slidable(
+      endActionPane: ActionPane(
+        extentRatio: 0.25,
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            autoClose: true,
+            icon: Icons.delete,
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            label: 'Delete',
+            onPressed: (context) {
+              // _controller.dismisDelete(openTicket, index,
+              //     _builtOpenTicket(_controller, index, context));
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(
+              //     duration: Duration(milliseconds: 600),
+              //     content: Text('Ticket deleted Sucessfully'),
+              //     backgroundColor: kDefaultGreen,
+              //   ),
+              // );
+            },
+          ),
+        ],
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+            border: Border(
+          bottom: BorderSide(color: kBorderColor, width: 1),
+        )),
+        child: TileListBox(
+          // merge: Text('Merge'),
+          isChecked: false,
+          // merge: _controller.openTicketList[index].ismerged == true
+          //     ? const Padding(
+          //         padding: EdgeInsets.all(4.0),
+          //         child: Text('Merge'),
+          //       )
+          //     : null,
+          // isChecked: openTicket.isChecked!,
+          // chechBoxCallback: (val) {
+          //   _controller.changeSwitchValue(index);
+          // },
+          onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => TicketDetail(index)),
+            // );
+          },
+          created: TimeAgo.timeAgoSinceDate(openTicket.addedAt!),
+          taxTitle: '${openTicket.id}',
+          amount:
+              'Rs.${Provider.of<TicketController>(context).calculateTotal(openTicket.items)}',
+          iconData: Icons.person,
+        ),
+      ),
+    );
+  }
 
   // void showDialog(BuildContext context, TicketProvider _controller) {
   void showDialog(BuildContext context) {
@@ -246,30 +266,4 @@ class TicketsScreen extends StatelessWidget {
       },
     );
   }
-
-  // _buildItem(BuildContext context, TicketProvider _controller, index) {
-  //   final openTicket = _controller.openTicketList[index];
-  //   return TileListBox(
-  //     merge: _controller.openTicketList[index].ismerged == true
-  //         ? Padding(
-  //             padding: const EdgeInsets.all(4.0),
-  //             child: Text('Merge'),
-  //           )
-  //         : null,
-  //     isChecked: openTicket.isChecked!,
-  //     chechBoxCallback: (val) {
-  //       _controller.changeSwitchValue(index);
-  //     },
-  //     onTap: () {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => TicketDetail(index)),
-  //       );
-  //     },
-  //     created: '${TimeAgo.timeAgoSinceDate(openTicket.created!)}',
-  //     taxTitle: '${openTicket.name}',
-  //     amount: '${openTicket.amount}',
-  //     iconData: Icons.person,
-  //   );
-  // }
 }
