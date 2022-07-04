@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/item.dart';
 import 'package:mypos/utils/constant.dart';
+import 'package:provider/provider.dart';
 // import 'package:provider/provider.dart';
 
 class AnimateItemList extends StatelessWidget {
@@ -22,34 +24,36 @@ class AnimateItemList extends StatelessWidget {
       color: Colors.transparent,
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
-        child: CachedNetworkImage(
-          imageBuilder: (context, imageProvider) => Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          imageUrl: item.image!,
-          progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-            child: CircularProgressIndicator(
-              color: kDefaultGreen,
-              value: downloadProgress.progress,
-            ),
-          ),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        ),
+        child: (item.image != null)
+            ? CachedNetworkImage(
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                imageUrl: item.image!,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Center(
+                  child: CircularProgressIndicator(
+                    color: kDefaultGreen,
+                    value: downloadProgress.progress,
+                  ),
+                ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              )
+            : Image.asset('assets/images/default-image.jpg'),
       ),
     );
 
     return GestureDetector(
       onTap: () {
         onClick(imageGlobalKey);
-        // Provider.of<ItemsController>(context, listen: false)
-        //     .addProductToCart(item);
-        // Provider.of<ItemsController>(context, listen: false).sum();
+        Provider.of<TicketController>(context, listen: false)
+            .addProductToCart(item);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

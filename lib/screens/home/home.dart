@@ -11,6 +11,7 @@ import 'package:mypos/screens/addon/addon_screen.dart';
 import 'package:mypos/screens/category/category_screen.dart';
 import 'package:mypos/screens/customer/customer_screen.dart';
 import 'package:mypos/screens/home/components/items_grid_view.dart';
+import 'package:mypos/screens/home/components/items_listview.dart';
 import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/screens/item/itemlist_screen.dart';
 import 'package:mypos/screens/open%20ticket/components/ticket_container.dart';
@@ -509,25 +510,32 @@ class _HomepageState extends State<Homepage> {
                     //       )
                     //     : Container(),
                     Provider.of<ProductController>(context).allItem.isNotEmpty
-                        ? Builder(builder: (context) {
-                            List<Item> _allItems;
-                            if (_controller.text.isNotEmpty) {
-                              _allItems = _searchedItems;
-                            } else if (dropdownValue != 'All Items') {
-                              _allItems = _itemsBasedOnCategory;
-                            } else {
-                              _allItems = Provider.of<ProductController>(
-                                      context,
-                                      listen: false)
-                                  .allItem;
-                            }
-                            return ItemsGridView(
-                              // futureItem: Provider.of<ProductController>(context)
-                              //     .getAllItems(),
-                              items: _allItems,
-                              onClick: listClick,
-                            );
-                          })
+                        ? Builder(
+                            builder: (context) {
+                              List<Item> _allItems;
+                              if (_controller.text.isNotEmpty) {
+                                _allItems = _searchedItems;
+                              } else if (dropdownValue != 'All Items') {
+                                _allItems = _itemsBasedOnCategory;
+                              } else {
+                                _allItems = Provider.of<ProductController>(
+                                        context,
+                                        listen: false)
+                                    .allItem;
+                              }
+                              return Provider.of<SettingController>(context,
+                                          listen: false)
+                                      .isListLayout
+                                  ? ItemsListView(
+                                      items: _allItems, onClick: listClick)
+                                  : ItemsGridView(
+                                      // futureItem: Provider.of<ProductController>(context)
+                                      //     .getAllItems(),
+                                      items: _allItems,
+                                      onClick: listClick,
+                                    );
+                            },
+                          )
                         // Provider.of<ItemsController>(context).items.isNotEmpty
                         //     ? ((Provider.of<SettingController>(context,
                         //                 listen: false)
