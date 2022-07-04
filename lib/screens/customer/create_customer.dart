@@ -182,19 +182,25 @@ class _CreateCustomerState extends State<CreateCustomer> {
                       customer.id = widget.toEditCustomer!.id;
                       if (widget.toEditCustomer!.email != null) {
                         if (widget.toEditCustomer!.email!.trim() !=
-                            _email.text.trim()) {
+                                _email.text.trim() &&
+                            _email.text.isNotEmpty) {
                           customer.email = _email.text;
                         }
                       } else {
-                        customer.email = _email.text;
+                        if (_email.text.isNotEmpty) {
+                          customer.email = _email.text;
+                        }
                       }
                       if (widget.toEditCustomer!.phone != null) {
                         if (widget.toEditCustomer!.phone!.trim() !=
-                            _phone.text.trim()) {
+                                _phone.text.trim() &&
+                            _phone.text.isNotEmpty) {
                           customer.phone = _phone.text;
                         }
                       } else {
-                        customer.phone = _phone.text;
+                        if (_phone.text.isNotEmpty) {
+                          customer.phone = _phone.text;
+                        }
                       }
                       print(customer.toJson());
                       Provider.of<CustomerController>(context, listen: false)
@@ -205,8 +211,6 @@ class _CreateCustomerState extends State<CreateCustomer> {
                           backgroundColor: kDefaultGreen,
                         ),
                       );
-                      // int count = 0;
-                      // Navigator.of(context).popUntil((_) => count++ >= 2);
                     } else {
                       if (_email.text.isNotEmpty) {
                         customer.email = _email.text;
