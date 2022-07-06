@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
 import 'package:mypos/screens/open%20ticket/tickets_screen.dart';
