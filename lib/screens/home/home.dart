@@ -16,6 +16,7 @@ import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/screens/item/itemlist_screen.dart';
 import 'package:mypos/screens/open%20ticket/components/ticket_container.dart';
 import 'package:mypos/screens/open%20ticket/ticketedit_screen.dart';
+import 'package:mypos/screens/others/testimg.dart';
 import 'package:mypos/screens/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -154,29 +155,33 @@ class _HomepageState extends State<Homepage> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            if (Provider.of<CustomerController>(context,
-                                        listen: false)
-                                    .selectedCustomerForTicket !=
-                                null) {
-                              Navigator.push(
+                            Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Profile(
-                                    customer: Provider.of<CustomerController>(
-                                            context,
-                                            listen: false)
-                                        .selectedCustomerForTicket!,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CustomerScreen(),
-                                ),
-                              );
-                            }
+                                    builder: (context) => ImageUploadTest()));
+                            // if (Provider.of<CustomerController>(context,
+                            //             listen: false)
+                            //         .selectedCustomerForTicket !=
+                            //     null) {
+                            //   Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) => Profile(
+                            //         customer: Provider.of<CustomerController>(
+                            //                 context,
+                            //                 listen: false)
+                            //             .selectedCustomerForTicket!,
+                            //       ),
+                            //     ),
+                            //   );
+                            // } else {
+                            //   Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) => const CustomerScreen(),
+                            //     ),
+                            //   );
+                            // }
                           },
 
                           //showdialog for bigger screen
@@ -575,12 +580,13 @@ class _HomepageState extends State<Homepage> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.4,
                                   child: PrimaryButton(
-                                      title: 'Go To Items',
-                                      onPressed: () {
-                                        setState(() {
-                                          selectedIndex = 2;
-                                        });
-                                      }),
+                                    title: 'Go To Items',
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedIndex = 2;
+                                      });
+                                    },
+                                  ),
                                 ),
                               ],
                             ),

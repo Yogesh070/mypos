@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:mypos/model/item.dart';
 import 'package:dio/dio.dart';
 import 'package:mypos/utils/boxes.dart';
@@ -7,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ProductController extends ChangeNotifier {
   List<Item> _product = [];
@@ -23,6 +26,50 @@ class ProductController extends ChangeNotifier {
       },
     ),
   );
+
+//   Future<String> uploadImage(File file) async {
+//     String fileName = file.relativePath!.split('/').last;
+//     FormData formData = FormData.fromMap({
+//         "image":
+//             await MultipartFile.fromFile(file.path, filename:fileName),
+//     });
+//     Response response = await dio.post("/info", data: formData,onSendProgress: (int sent, int total) {
+//     print('$sent $total');
+//   },);
+//     return response.data['id'];
+// }
+
+  void updateImage(File file, String id) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String? businessId = _prefs.getString('business_id');
+    String token = _prefs.getString('u_token')!;
+    String fileName = file.path.split('/').last;
+    FormData formData = FormData.fromMap({
+      "image": await MultipartFile.fromFile(
+        file.path,
+        filename: fileName,
+      ),
+    });
+    try {
+      Response response = await dio.put(
+        "https://api.buzz-test.tk/api/v1/business/$businessId/products/$id/image",
+        data: formData,
+        onSendProgress: (int sent, int total) {
+          print('$sent $total');
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+      print(response.statusMessage);
+    } on DioError catch (e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<Item>> getAllItems() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     String? id = _prefs.getString('business_id');
@@ -30,11 +77,11 @@ class ProductController extends ChangeNotifier {
     try {
       var res = await dio.get(
         '/business/$id/products',
-        options: Options(
-          headers: {
-            "businessId": "Bearer $id",
-          },
-        ),
+        // options: Options(
+        //   headers: {
+        //     "businessId": "Bearer $id",
+        //   },
+        // ),
       );
       print(res.data);
       _product = List<Item>.from(res.data['data'].map((e) => Item.fromJson(e)));
@@ -53,10 +100,10 @@ class ProductController extends ChangeNotifier {
       var res = await dio.get(
         '/business/$id/products/$productID',
         options: Options(
-          headers: {
-            "businessId": "Bearer $id",
-          },
-        ),
+            // headers: {
+            //   "businessId": "Bearer $id",
+            // },
+            ),
       );
       // print(res.data);
       notifyListeners();
