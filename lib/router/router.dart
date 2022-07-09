@@ -10,7 +10,6 @@ import 'package:mypos/screens/category/category_screen.dart';
 import 'package:mypos/screens/home/home.dart';
 import 'package:mypos/screens/open%20ticket/ticketedit_screen.dart';
 import 'package:mypos/screens/others/splash_screen.dart';
-import 'package:mypos/screens/payment/cash_payment.dart';
 
 class DefaultRouter {
   static final GoRouter route = GoRouter(
