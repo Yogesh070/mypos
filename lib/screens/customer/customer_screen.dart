@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/model/customer.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
               leading: GestureDetector(
                 child: const Icon(Icons.arrow_back_ios_new),
                 onTap: () {
-                  Navigator.of(context).pop();
+                  context.pop();
                 },
               ),
             )
@@ -55,7 +56,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        context.pop();
                       },
                       child: const Icon(Icons.close),
                     )
@@ -156,14 +157,8 @@ class _CustomerScreenState extends State<CustomerScreen> {
                                     );
                                   },
                                 )
-                              : Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                      customer: customer,
-                                    ),
-                                  ),
-                                );
+                              : context.goNamed('profile',
+                                  params: {"uid": customer.id!});
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -220,12 +215,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
         child: const Icon(Icons.add),
         onPressed: () {
           (MediaQuery.of(context).size.width < 600)
-              ? Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CreateCustomer(),
-                  ),
-                )
+              ? context.goNamed('add-customer')
               : showDialog(
                   barrierColor: Colors.transparent,
                   context: context,

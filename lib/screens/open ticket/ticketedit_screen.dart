@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/ticket_item.dart';
-import 'package:mypos/screens/payment/payment_method.dart';
 import 'package:mypos/screens/widgets/menu_items.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -74,7 +74,6 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
             onPressed: () {
               Provider.of<TicketController>(context, listen: false)
                   .clearTicket();
-              //  Provider.of<TicketController>(context, listen: false).total = 0;
             },
             style: TextButton.styleFrom(
               primary: const Color(0xff30B700),
@@ -184,7 +183,7 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                                   listen: false)
                               .removeCustomerFromTicket();
                         }
-                        Navigator.pop(context);
+                        context.pop();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -202,18 +201,17 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                   child: PrimaryButton(
                     title: 'Proceed to Pay',
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PaymentMethod(
-                            totalAmount: Provider.of<TicketController>(context,
-                                    listen: false)
-                                .calculateTotal(Provider.of<TicketController>(
-                                        context,
-                                        listen: false)
-                                    .ticketList),
+                      if (Provider.of<TicketController>(context, listen: false)
+                          .ticketList
+                          .isNotEmpty) {
+                        context.goNamed('payment-method');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Cannot proceed with empty items!'),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     },
                     padding: const EdgeInsets.symmetric(vertical: 20),
                   ),

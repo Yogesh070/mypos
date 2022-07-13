@@ -5,7 +5,6 @@ import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
-import 'package:mypos/screens/home/home.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -99,12 +98,12 @@ class CompleteActionPayment extends StatelessWidget {
                       hintText: 'ok.123@gmail.com',
                       textEditingController: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (val) {
-                        if (val!.isEmpty) {
-                          return 'Cannot add empty email';
-                        }
-                        return null;
-                      },
+                      // validator: (val) {
+                      //   if (val!.isEmpty) {
+                      //     return 'Cannot add empty email';
+                      //   }
+                      //   return null;
+                      // },
                     ),
                   ),
                 ],
@@ -154,23 +153,13 @@ class CompleteActionPayment extends StatelessWidget {
                                 .removeCustomerFromTicket();
                           }
                           context.goNamed('home');
-                          // Navigator.pushAndRemoveUntil(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => const Homepage()),
-                          //     (route) => false);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Cannot save empty ticket!'),
                             ),
                           );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const Homepage(),
-                            ),
-                          );
+                          context.goNamed('home');
                         }
                       }
                     },

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
+import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/screens/widgets/timeago.dart';
 import 'receiptdetails.dart';
 
@@ -32,16 +33,8 @@ class _RecieptScreenState extends State<RecieptScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF4F4F4),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     debugPrint("Receipt Added");
-      //   },
-      //   child: const Icon(
-      //     Icons.add,
-      //     color: Colors.white,
-      //   ),
-      //   backgroundColor: const Color(0xff30B700),
-      // ),
+      appBar: const CustomAppBar(),
+      drawer: const SideMenu(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

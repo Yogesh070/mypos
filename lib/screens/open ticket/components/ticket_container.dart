@@ -1,11 +1,7 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
-import 'package:mypos/screens/open%20ticket/tickets_screen.dart';
-// import 'package:mypos/controllers/ticket.dart';
-// import 'package:mypos/screen/openticket/tickets_screen.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +25,6 @@ class _TicketContainerState extends State<TicketContainer> {
 
   @override
   Widget build(BuildContext context) {
-    // var _controller = Provider.of<TicketProvider>(context);
     var _itemCon = Provider.of<TicketController>(context);
     return Container(
       // height: 78,
@@ -44,16 +39,9 @@ class _TicketContainerState extends State<TicketContainer> {
           Expanded(
             child: InkWell(
               onTap: () {
-                // context.go('/ticket');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TicketsScreen(),
-                  ),
-                );
+                context.goNamed('open-ticket');
               },
               child: Column(
-                // ignore: prefer_const_literals_to_create_immutables
                 children: [
                   const Text(
                     'Open Tickets',

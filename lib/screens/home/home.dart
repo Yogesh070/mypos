@@ -1,5 +1,4 @@
-// ignore_for_file: prefer_const_constructors
-
+import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/category_controller.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/product_controller.dart';
@@ -7,33 +6,18 @@ import 'package:mypos/controllers/settings_controller.dart';
 import 'package:mypos/controllers/sidenav_controller.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/category.dart';
-import 'package:mypos/screens/addon/addon_screen.dart';
-import 'package:mypos/screens/category/category_screen.dart';
-import 'package:mypos/screens/customer/customer_screen.dart';
 import 'package:mypos/screens/home/components/items_grid_view.dart';
 import 'package:mypos/screens/home/components/items_listview.dart';
 import 'package:mypos/screens/home/components/sidemenu.dart';
-import 'package:mypos/screens/item/itemlist_screen.dart';
 import 'package:mypos/screens/open%20ticket/components/ticket_container.dart';
-import 'package:mypos/screens/open%20ticket/ticketedit_screen.dart';
-import 'package:mypos/screens/others/testimg.dart';
-import 'package:mypos/screens/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/item.dart';
-import 'package:mypos/screens/reciept/reciept_screen.dart';
-import 'package:mypos/screens/settings/settings.dart';
 import 'package:mypos/utils/addtocartanimation/add_to_cart_animation.dart';
 import 'package:mypos/utils/addtocartanimation/add_to_cart_icon.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
-
-class MenuOptions {
-  String title;
-  IconData icon;
-  MenuOptions({required this.title, required this.icon});
-}
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -46,18 +30,6 @@ class _HomepageState extends State<Homepage> {
   int selectedIndex = 0;
 
   late List<Category> items;
-  final List<MenuOptions> menuOptions = [
-    MenuOptions(title: 'Menu', icon: Icons.fastfood),
-    MenuOptions(title: 'Bills', icon: Icons.line_style),
-    MenuOptions(title: 'Items', icon: Icons.list),
-    MenuOptions(title: 'Category', icon: Icons.category),
-    MenuOptions(title: 'Addon', icon: Icons.add),
-    // MenuOptions(title: 'Creditors', icon: Icons.credit_card),
-    MenuOptions(title: 'Notifications', icon: Icons.notifications),
-    MenuOptions(title: 'Settings', icon: Icons.settings),
-    MenuOptions(title: 'Apps', icon: Icons.app_settings_alt),
-    MenuOptions(title: 'Help', icon: Icons.help),
-  ];
   String dropdownValue = 'All Items';
 
   double sidebarPanelWidth = 60.0;
@@ -155,33 +127,23 @@ class _HomepageState extends State<Homepage> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ImageUploadTest()));
-                            // if (Provider.of<CustomerController>(context,
-                            //             listen: false)
-                            //         .selectedCustomerForTicket !=
-                            //     null) {
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (context) => Profile(
-                            //         customer: Provider.of<CustomerController>(
-                            //                 context,
-                            //                 listen: false)
-                            //             .selectedCustomerForTicket!,
-                            //       ),
-                            //     ),
-                            //   );
-                            // } else {
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (context) => const CustomerScreen(),
-                            //     ),
-                            //   );
-                            // }
+                            if (Provider.of<CustomerController>(context,
+                                        listen: false)
+                                    .selectedCustomerForTicket !=
+                                null) {
+                              context.goNamed(
+                                'profile',
+                                params: {
+                                  "uid": Provider.of<CustomerController>(
+                                          context,
+                                          listen: false)
+                                      .selectedCustomerForTicket!
+                                      .id!
+                                },
+                              );
+                            } else {
+                              context.goNamed('customers');
+                            }
                           },
 
                           //showdialog for bigger screen
@@ -229,9 +191,7 @@ class _HomepageState extends State<Homepage> {
                 toolbarHeight: 80,
                 title: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const TicketEditScreen(),
-                    ));
+                    context.goNamed('ticket');
                   },
                   child: Row(
                     children: [
@@ -264,53 +224,9 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
                 ))
-            : AppBar(
-                title: Text(
-                  menuOptions[selectedIndex].title,
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ),
-        body: Builder(
-          builder: (context) {
-            switch (selectedIndex) {
-              case 0:
-                return newHome(media);
-              case 1:
-                return const RecieptScreen();
-              case 2:
-                return const ItemScreen();
-              case 3:
-                return const CategoryScreen();
-              case 4:
-                return const AddonListScreen();
-              case 5:
-                return Text('Notification');
-
-              // return const DropdownNotificationCreditor();
-              case 6:
-                return Text('ADD Notification');
-
-              // return const AddNotification();
-              case 7:
-                return const Settings();
-              case 8:
-                return const Center(child: Text('App'));
-              case 9:
-                return const Center(child: Text('Help'));
-              default:
-            }
-            return Container();
-          },
-        ),
-        drawer: SideMenu(
-          onNavIndexChanged: (int index) {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
-          selectedIndex: selectedIndex,
-          menuOptions: menuOptions,
-        ),
+            : const CustomAppBar(),
+        body: newHome(media),
+        drawer: const SideMenu(),
       ),
     );
   }
@@ -326,7 +242,6 @@ class _HomepageState extends State<Homepage> {
                   ? Container(
                       margin: const EdgeInsets.all(25),
                       child: const TicketContainer(),
-                      // child: Text('Ticket Container'),
                     )
                   : Container(),
               Container(
@@ -541,30 +456,6 @@ class _HomepageState extends State<Homepage> {
                                     );
                             },
                           )
-                        // Provider.of<ItemsController>(context).items.isNotEmpty
-                        //     ? ((Provider.of<SettingController>(context,
-                        //                 listen: false)
-                        //             .isListLayout)
-                        //         ? Provider.of<ItemsController>(context,
-                        //                     listen: false)
-                        //                 .sortedList
-                        //                 .isEmpty
-                        //             ? ItemsListView(
-                        //                 futureItem: futureItem,
-                        //                 onClick: listClick,
-                        //               )
-                        //             : ItemsSoretedListView(
-                        //                 futureItem: futureItem, onClick: listClick)
-                        //         : (Provider.of<ItemsController>(context,
-                        //                     listen: false)
-                        //                 .sortedList
-                        //                 .isNotEmpty
-                        //             ? SortedItemsGridView(
-                        //                 futureItem: futureItem, onClick: listClick)
-                        //             : ItemsGridView(
-                        //                 futureItem: futureItem,
-                        //                 onClick: listClick,
-                        //               )))
                         : Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -582,9 +473,7 @@ class _HomepageState extends State<Homepage> {
                                   child: PrimaryButton(
                                     title: 'Go To Items',
                                     onPressed: () {
-                                      setState(() {
-                                        selectedIndex = 2;
-                                      });
+                                      context.goNamed('item');
                                     },
                                   ),
                                 ),

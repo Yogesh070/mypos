@@ -1,8 +1,9 @@
+import 'package:go_router/go_router.dart';
 import 'package:mypos/components/shimmer_item_list.dart';
 import 'package:mypos/controllers/category_controller.dart';
 import 'package:mypos/model/category.dart';
-import 'package:mypos/screens/category/add_category.dart';
 import 'package:flutter/material.dart';
+import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 
@@ -27,14 +28,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBar(),
+      drawer: const SideMenu(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AddCategory(),
-            ),
-          );
+          context.goNamed('add-category');
         },
         child: const Icon(Icons.add),
       ),
@@ -122,13 +120,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               child: ListTile(
                                 contentPadding: EdgeInsets.zero,
                                 onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => AddCategory(
-                                        category: category,
-                                        forEdit: true,
-                                      ),
-                                    ),
+                                  context.goNamed(
+                                    'edit-category',
+                                    params: {"iid": category.id!},
                                   );
                                 },
                                 title: Text(category.name),

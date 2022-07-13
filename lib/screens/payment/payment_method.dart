@@ -1,6 +1,7 @@
 // ignore_for_file: unused_import
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/screens/payment/cash_payment.dart';
 
@@ -49,13 +50,7 @@ class PaymentMethod extends StatelessWidget {
                 title: 'Cash',
                 image: 'assets/images/money.png',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          CashPayment(totalAmount: totalAmount),
-                    ),
-                  );
+                  context.goNamed('cash');
                 },
               ),
               const Divider(

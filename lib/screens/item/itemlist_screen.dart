@@ -1,9 +1,10 @@
+import 'package:go_router/go_router.dart';
 import 'package:mypos/components/shimmer_item_list.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mypos/model/item.dart';
-import 'add_item.dart';
+import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 
@@ -23,29 +24,15 @@ class ItemScreen extends StatefulWidget {
 class _ItemScreenState extends State<ItemScreen> {
   final TextEditingController controller = TextEditingController();
   FoodCategory _groupValue = FoodCategory.snacks;
-  // late Future<APIResponse<List<Item>>> futureItem;
-  @override
-  void initState() {
-    // Provider.of<ProductController>(context, listen: false).getAllItems();
-    super.initState();
-    // futureItem = Future.delayed(const Duration(milliseconds: 200),
-    //     () => Provider.of<ItemsController>(context, listen: false).getItems());
-
-    // sortByCategory();
-  }
-
   List<Item> _searchedItems = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBar(),
+      drawer: const SideMenu(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const AddItem(),
-          ));
-          // .then(
-          //   (context) => _apiCon.getItems(),
-          // );
+          context.goNamed('add-item');
         },
         child: const Icon(Icons.add),
       ),
@@ -209,11 +196,9 @@ class _ItemScreenState extends State<ItemScreen> {
                               child: ListTile(
                                 contentPadding: EdgeInsets.zero,
                                 onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => AddItem(
-                                          forEdit: true, toEditItem: product),
-                                    ),
+                                  context.goNamed(
+                                    'edit-item',
+                                    params: {"iid": product.id!},
                                   );
                                 },
                                 leading: CircleAvatar(

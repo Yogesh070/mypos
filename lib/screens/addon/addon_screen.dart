@@ -2,6 +2,7 @@ import 'package:mypos/components/shimmer_item_list.dart';
 import 'package:mypos/controllers/addon_controller.dart';
 import 'package:mypos/model/addon.dart';
 import 'package:mypos/screens/addon/add_addon.dart';
+import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:mypos/utils/constant.dart';
@@ -32,14 +33,8 @@ class _AddonListScreenState extends State<AddonListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //     // leading: TextButton(
-      //     //   onPressed: () {
-      //     //     Provider.of<AddonController>(context, listen: false).syncAddon();
-      //     //   },
-      //     //   child: const Text('Sync Addon'),
-      //     // ),
-      //     ),
+      appBar: const CustomAppBar(),
+      drawer: const SideMenu(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(

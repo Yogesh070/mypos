@@ -1,8 +1,8 @@
+import 'package:go_router/go_router.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/customer.dart';
-import 'package:mypos/screens/customer/create_customer.dart';
 
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -88,7 +88,7 @@ class Profile extends StatelessWidget {
               leading: GestureDetector(
                 child: const Icon(Icons.arrow_back_ios_new),
                 onTap: () {
-                  Navigator.of(context).pop();
+                  context.pop();
                 },
               ),
               actions: [
@@ -109,8 +109,7 @@ class Profile extends StatelessWidget {
                                   listen: false)
                               .removeCustomerFromTicket();
                         }
-
-                        Navigator.pop(context);
+                        context.goNamed('home');
                       },
                       child: Text(
                         Provider.of<CustomerController>(context, listen: false)
@@ -211,15 +210,8 @@ class Profile extends StatelessWidget {
                   onPressed: () {
                     // Provider.of<CustomerController>(context, listen: false)
                     //     .toEditCustomer = customer;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreateCustomer(
-                          forEdit: true,
-                          toEditCustomer: customer,
-                        ),
-                      ),
-                    );
+                    context
+                        .goNamed('edit-profile', params: {"uid": customer.id!});
                   },
                 ),
                 IconButton(
