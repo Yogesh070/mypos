@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mypos/screens/home/components/side_navbar_tile.dart';
-import 'package:mypos/screens/home/home.dart';
+
+class MenuOptions {
+  String title;
+  IconData icon;
+  String path;
+  MenuOptions({required this.title, required this.icon, required this.path});
+}
+
+final List<MenuOptions> menuOptions = [
+  MenuOptions(title: 'Menu', icon: Icons.fastfood, path: '/home'),
+  MenuOptions(title: 'Bills', icon: Icons.line_style, path: '/bill'),
+  MenuOptions(title: 'Items', icon: Icons.list, path: '/item'),
+  MenuOptions(title: 'Category', icon: Icons.category, path: '/category'),
+  MenuOptions(title: 'Addon', icon: Icons.add, path: '/addon'),
+  // MenuOptions(title: 'Creditors', icon: Icons.credit_card),
+  // MenuOptions(title: 'Notifications', icon: Icons.notifications),
+  // MenuOptions(title: 'Settings', icon: Icons.settings),
+  // MenuOptions(title: 'Apps', icon: Icons.app_settings_alt),
+  // MenuOptions(title: 'Help', icon: Icons.help),
+];
 
 class SideMenu extends StatelessWidget {
-  final Function onNavIndexChanged;
-  final int selectedIndex;
-  final List<MenuOptions> menuOptions;
-  const SideMenu(
-      {Key? key,
-      required this.onNavIndexChanged,
-      required this.selectedIndex,
-      required this.menuOptions})
-      : super(key: key);
+  const SideMenu({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    String currentLocation = GoRouter.of(context).location;
     return Drawer(
       child: ListView(
         children: [
@@ -25,30 +38,47 @@ class SideMenu extends StatelessWidget {
           Column(
             children: menuOptions
                 .map((menuOption) => SideNavBarTile(
-                      sideBarIndicatorColor:
-                          selectedIndex == menuOptions.indexOf(menuOption)
-                              ? const Color(0xff30B700)
-                              : Colors.transparent,
-                      textIndicatorColor:
-                          selectedIndex == menuOptions.indexOf(menuOption)
-                              ? const Color(0xff30B700)
-                              : Colors.black,
-                      iconIndicatorColor:
-                          selectedIndex == menuOptions.indexOf(menuOption)
-                              ? const Color(0xff30B700)
-                              : Colors.black,
+                      sideBarIndicatorColor: currentLocation == menuOption.path
+                          ? const Color(0xff30B700)
+                          : Colors.transparent,
+                      textIndicatorColor: currentLocation == menuOption.path
+                          ? const Color(0xff30B700)
+                          : Colors.black,
+                      iconIndicatorColor: currentLocation == menuOption.path
+                          ? const Color(0xff30B700)
+                          : Colors.black,
                       title: menuOption.title,
                       icon: menuOption.icon,
                       press: () {
-                        onNavIndexChanged(menuOptions.indexOf(menuOption));
-                        Navigator.pop(context);
+                        context.go(menuOption.path);
                       },
-                      selected:
-                          selectedIndex == menuOptions.indexOf(menuOption),
+                      selected: currentLocation == menuOption.path,
                     ))
                 .toList(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
+  @override
+  final Size preferredSize;
+
+  const CustomAppBar({Key? key})
+      : preferredSize = const Size.fromHeight(50.0),
+        super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    String currentLocation = GoRouter.of(context).location;
+    return AppBar(
+      title: Text(
+        menuOptions
+            .where((element) => element.path == currentLocation)
+            .first
+            .title,
+        style: const TextStyle(color: Colors.black),
       ),
     );
   }
