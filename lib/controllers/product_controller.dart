@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
-import 'package:http_parser/http_parser.dart';
 
 class ProductController extends ChangeNotifier {
   List<Item> _product = [];
@@ -26,18 +25,6 @@ class ProductController extends ChangeNotifier {
       },
     ),
   );
-
-//   Future<String> uploadImage(File file) async {
-//     String fileName = file.relativePath!.split('/').last;
-//     FormData formData = FormData.fromMap({
-//         "image":
-//             await MultipartFile.fromFile(file.path, filename:fileName),
-//     });
-//     Response response = await dio.post("/info", data: formData,onSendProgress: (int sent, int total) {
-//     print('$sent $total');
-//   },);
-//     return response.data['id'];
-// }
 
   void updateImage(File file, String id) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -113,25 +100,50 @@ class ProductController extends ChangeNotifier {
     }
   }
 
-  void addItem(Item product) async {
+  void addItem(Item product, bool viaFormData, {File? file}) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     String token = _prefs.getString('u_token')!;
     String id = _prefs.getString('business_id')!;
-    try {
-      http.Response res = await http.post(
-        Uri.parse('https://api.buzz-test.tk/api/v1/business/$id/products'),
-        body: jsonEncode(product.toJson()),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          "Authorization": "Bearer $token",
+    if (viaFormData) {
+      String fileName = file!.path.split('/').last;
+      FormData formData = FormData.fromMap({
+        "image": await MultipartFile.fromFile(
+          file.path,
+          filename: fileName,
+        ),
+        ...product.toJson()
+      });
+      Response response = await dio.post(
+        'https://api.buzz-test.tk/api/v1/business/$id/products',
+        data: formData,
+        onSendProgress: (int sent, int total) {
+          print('$sent $total');
         },
+        options: Options(
+          headers: {
+            // 'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          },
+        ),
       );
-      print(res.body);
-      _product.add(product);
-      notifyListeners();
-      // addItemInHive(product);
-    } on DioError catch (e) {
-      throw Exception(e);
+    } else {
+      try {
+        http.Response res = await http.post(
+          Uri.parse('https://api.buzz-test.tk/api/v1/business/$id/products'),
+          body: jsonEncode(product.toJson()),
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            "Authorization": "Bearer $token",
+          },
+        );
+        print(res.body);
+        _product.add(product);
+        notifyListeners();
+        // addItemInHive(product);
+      } on DioError catch (e) {
+        throw Exception(e);
+      }
     }
   }
 

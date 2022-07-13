@@ -1,5 +1,8 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mypos/controllers/addon_controller.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/model/item.dart';
@@ -32,13 +35,43 @@ class _AddItemState extends State<AddItem> {
   final TextEditingController _inStock = TextEditingController();
   final TextEditingController _sku = TextEditingController();
 
-  final bool _usesOfferPrice = false;
-  final bool _trackStock = false;
-  final bool _isVeg = false;
+  bool _usesOfferPrice = false;
+  bool _trackStock = false;
+  bool _isVeg = false;
+
+  List<XFile>? _imageFileList;
+
+  void _setImageFileListFromFile(XFile? value) {
+    _imageFileList = value == null ? null : <XFile>[value];
+  }
+
+  dynamic _pickImageError;
+
+  String? _retrieveDataError;
+  XFile? pickedFile;
+
+  final ImagePicker _picker = ImagePicker();
+  Future<void> _onImageButtonPressed(ImageSource source,
+      {BuildContext? context}) async {
+    try {
+      pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 400,
+        maxHeight: 400,
+      );
+      // setState(() {
+      //   // _setImageFileListFromFile(pickedFile);
+      // });
+    } catch (e) {
+      setState(() {
+        _pickImageError = e;
+      });
+    }
+  }
 
   final _formKey = GlobalKey<FormState>();
 
-  final List<String> _selectedAddons = [];
+  List<String> _selectedAddons = [];
 
   String? checkIfEmpty(String? val) {
     if (val!.isEmpty) {
@@ -68,7 +101,7 @@ class _AddItemState extends State<AddItem> {
 
     if (widget.forEdit!) {
       _itemName.text = widget.toEditItem!.name;
-      _itemPrice.text = widget.toEditItem!.price;
+      _itemPrice.text = widget.toEditItem!.price.toString();
       _itemDes.text = widget.toEditItem!.description ?? '';
       if (widget.toEditItem!.costPrice != null) {
         _costPrice.text = widget.toEditItem!.costPrice.toString();
@@ -83,20 +116,53 @@ class _AddItemState extends State<AddItem> {
         _costPrice.text = widget.toEditItem!.inStock.toString();
       }
       _sku.text = widget.toEditItem!.sku ?? '';
+      _selectedAddons = widget.toEditItem!.addons ?? [];
     }
     super.initState();
   }
 
-  // void updateField(Item toEditItem,dynamic toEditField, TextEditingController controller){
-  //       if (toEditItem.toEditField != null) {
-  //                       if (toEditItem.toEditField!.trim() !=
-  //                           _toEditField.text.trim()) {
-  //                         customer.email = _email.text;
-  //                       }
-  //                     } else {
-  //                       customer.email = _email.text;
-  //                     }
-  // }
+  Text? _getRetrieveErrorWidget() {
+    if (_retrieveDataError != null) {
+      final Text result = Text(_retrieveDataError!);
+      _retrieveDataError = null;
+      return result;
+    }
+    return null;
+  }
+
+  Widget _previewImages() {
+    final Text? retrieveError = _getRetrieveErrorWidget();
+    if (retrieveError != null) {
+      return retrieveError;
+    }
+    if (_imageFileList != null) {
+      return Semantics(
+        label: 'image_picker_example_picked_images',
+        child: ListView.builder(
+          key: UniqueKey(),
+          itemBuilder: (BuildContext context, int index) {
+            return Semantics(
+              label: 'image_picker_example_picked_image',
+              child: kIsWeb
+                  ? Image.network(_imageFileList![index].path)
+                  : Image.file(File(_imageFileList![index].path)),
+            );
+          },
+          itemCount: _imageFileList!.length,
+        ),
+      );
+    } else if (_pickImageError != null) {
+      return Text(
+        'Pick image error: $_pickImageError',
+        textAlign: TextAlign.center,
+      );
+    } else {
+      return const Text(
+        'You have not yet picked an image.',
+        textAlign: TextAlign.center,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,26 +198,47 @@ class _AddItemState extends State<AddItem> {
                   }
                   Provider.of<ProductController>(context, listen: false)
                       .updateProduct(item, widget.toEditItem!.id!);
+                  if (pickedFile != null && _pickImageError == null) {
+                    Provider.of<ProductController>(context, listen: false)
+                        .updateImage(
+                            File(pickedFile!.path), widget.toEditItem!.id!);
+                  }
                 } else {
-                  Provider.of<ProductController>(context, listen: false)
-                      .addItem(
-                    Item(
-                      id: 'id',
-                      name: _itemName.text,
-                      price: _itemPrice.text,
-                      addons: _selectedAddons,
-                      usesOfferPrice: _usesOfferPrice,
-                      offerPrice: int.parse(_offerPrice.text),
-                      costPrice: int.parse(_costPrice.text),
-                      usesStocks: true,
-                      isVeg: _isVeg,
-                      description: _itemDes.text,
-                      sku: _sku.text,
-                      inStock: int.parse(_inStock.text),
-                      lowStock: int.parse(_lowStock.text),
-                    ),
+                  Item toAddItem = Item(
+                    id: 'id',
+                    name: _itemName.text,
+                    price: _itemPrice.text,
+                    addons: _selectedAddons,
+                    usesOfferPrice: _usesOfferPrice,
+                    offerPrice: int.parse(_offerPrice.text),
+                    costPrice: int.parse(_costPrice.text),
+                    usesStocks: true,
+                    isVeg: _isVeg,
+                    description: _itemDes.text,
+                    sku: _sku.text,
+                    inStock: int.tryParse(_inStock.text),
+                    lowStock: int.tryParse(_lowStock.text),
                   );
-                  Navigator.of(context).pop();
+                  if (pickedFile != null) {
+                    print("to upload image " + pickedFile!.name);
+                    Provider.of<ProductController>(context, listen: false)
+                        .addItem(toAddItem, true, file: File(pickedFile!.path));
+                  } else if (_pickImageError != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Pick image error: $_pickImageError',
+                          textAlign: TextAlign.center,
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } else {
+                    print("Without upload image ");
+                    Provider.of<ProductController>(context, listen: false)
+                        .addItem(toAddItem, false);
+                    Navigator.of(context).pop();
+                  }
                 }
               }
             },
@@ -175,6 +262,12 @@ class _AddItemState extends State<AddItem> {
                   hintText: 'Price',
                   textEditingController: _itemPrice,
                   keyboardType: TextInputType.number,
+                  validator: (val) {
+                    if (int.tryParse(val!) == null) {
+                      return "Invalid value";
+                    }
+                    return null;
+                  },
                 ),
                 AddTextField(
                   hintText: 'Description',
@@ -184,14 +277,25 @@ class _AddItemState extends State<AddItem> {
                   hintText: 'Cost Price',
                   textEditingController: _costPrice,
                   keyboardType: TextInputType.number,
-                  validator: checkIfEmpty,
+                  validator: (val) {
+                    if (int.tryParse(val!) == null) {
+                      return "Invalid value";
+                    }
+                    if (val.isEmpty) {
+                      return "Cost Price cannot be empty";
+                    }
+                    return null;
+                  },
                 ),
                 AddTextField(
                   hintText: 'Offer Price',
                   textEditingController: _offerPrice,
                   keyboardType: TextInputType.number,
                   validator: (String? val) {
-                    if (int.parse(_itemPrice.text) > int.parse(val!)) {
+                    if (int.tryParse(val!) == null) {
+                      return "Invalid value";
+                    }
+                    if (int.parse(_itemPrice.text) < int.parse(val)) {
                       return 'Offer Price should be less than product\'s price';
                     } else {
                       return null;
@@ -201,10 +305,20 @@ class _AddItemState extends State<AddItem> {
                 ListTileWithCupertinoSwitch(
                   title: 'Is Veg',
                   value: _isVeg,
+                  onChanged: (val) {
+                    setState(() {
+                      _isVeg = val;
+                    });
+                  },
                 ),
                 ListTileWithCupertinoSwitch(
                   title: 'Uses OfferPrice',
                   value: _usesOfferPrice,
+                  onChanged: (val) {
+                    setState(() {
+                      _usesOfferPrice = val;
+                    });
+                  },
                 ),
                 const NewSection(
                   title: 'Inventory',
@@ -212,28 +326,56 @@ class _AddItemState extends State<AddItem> {
                 ListTileWithCupertinoSwitch(
                   title: 'Track Stock',
                   value: _trackStock,
+                  onChanged: (val) {
+                    setState(() {
+                      _trackStock = val;
+                    });
+                  },
                 ),
-                // _trackStock
-                //     ?
-                Column(
-                  children: [
-                    AddTextField(
-                      hintText: 'In Stock',
-                      textEditingController: _inStock,
-                      keyboardType: TextInputType.number,
-                    ),
-                    AddTextField(
-                      hintText: 'Low Stock',
-                      textEditingController: _lowStock,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ],
-                ),
-                // : const SizedBox(),
+                _trackStock
+                    ? Column(
+                        children: [
+                          AddTextField(
+                            hintText: 'In Stock',
+                            textEditingController: _inStock,
+                            keyboardType: TextInputType.number,
+                            validator: (val) {
+                              if (int.tryParse(val!) == null) {
+                                return "Invalid value";
+                              }
+                              if (_trackStock && val.isEmpty) {
+                                return "Field cannot be empty";
+                              }
+                              return null;
+                            },
+                          ),
+                          AddTextField(
+                            hintText: 'Low Stock',
+                            textEditingController: _lowStock,
+                            keyboardType: TextInputType.number,
+                            validator: (val) {
+                              if (int.tryParse(val!) == null) {
+                                return "Invalid value";
+                              }
+                              if (_trackStock && val.isEmpty) {
+                                return "Field cannot be empty";
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      )
+                    : const SizedBox(),
                 AddTextField(
                   hintText: 'SKU',
                   textEditingController: _sku,
                   keyboardType: TextInputType.number,
+                  validator: (val) {
+                    if (int.tryParse(val!) == null) {
+                      return "Invalid value";
+                    }
+                    return null;
+                  },
                 ),
                 const NewSection(
                   title: 'Addons',
@@ -245,23 +387,31 @@ class _AddItemState extends State<AddItem> {
                   itemBuilder: (context, index) {
                     final addon =
                         context.watch<AddonController>().allAddon[index];
-                    // bool isSelected = false;
-
                     return ListTileWithCupertinoSwitch(
                       title: addon.name,
                       value: _selectedAddons.contains(addon.id),
-                      onAddonSelected: (newVal) {
+                      onChanged: (val) {
                         setState(() {
-                          if (newVal) {
+                          if (val) {
                             _selectedAddons.add(addon.id);
                           } else {
                             _selectedAddons.remove(addon.id);
                           }
                         });
-                        print(_selectedAddons);
                       },
                     );
                   },
+                ),
+                Semantics(
+                  label: 'image_picker_example_from_gallery',
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      _onImageButtonPressed(ImageSource.gallery,
+                          context: context);
+                    },
+                    tooltip: 'Pick Image from gallery',
+                    child: const Icon(Icons.photo),
+                  ),
                 ),
               ],
             ),
@@ -297,31 +447,23 @@ class NewSection extends StatelessWidget {
   }
 }
 
-// ignore: must_be_immutable
-class ListTileWithCupertinoSwitch extends StatefulWidget {
+class ListTileWithCupertinoSwitch extends StatelessWidget {
   final String title;
-  bool value;
-  final ValueChanged<bool>? onAddonSelected;
-  ListTileWithCupertinoSwitch(
+  final bool value;
+  final void Function(bool) onChanged;
+  const ListTileWithCupertinoSwitch(
       {Key? key,
       required this.title,
       required this.value,
-      this.onAddonSelected})
+      required this.onChanged})
       : super(key: key);
 
-  @override
-  State<ListTileWithCupertinoSwitch> createState() =>
-      _ListTileWithCupertinoSwitchState();
-}
-
-class _ListTileWithCupertinoSwitchState
-    extends State<ListTileWithCupertinoSwitch> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
-        widget.title,
+        title,
         style: const TextStyle(
           fontSize: 16.0,
         ),
@@ -330,16 +472,8 @@ class _ListTileWithCupertinoSwitchState
         scale: 0.6,
         child: CupertinoSwitch(
           trackColor: Colors.black,
-          value: widget.value,
-          onChanged: (val) {
-            setState(() {
-              widget.value = val;
-              print(widget.title + " changed " + widget.value.toString());
-            });
-            if (widget.onAddonSelected != null) {
-              widget.onAddonSelected!(val);
-            }
-          },
+          value: value,
+          onChanged: onChanged,
         ),
       ),
     );

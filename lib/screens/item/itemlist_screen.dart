@@ -209,14 +209,12 @@ class _ItemScreenState extends State<ItemScreen> {
                               child: ListTile(
                                 contentPadding: EdgeInsets.zero,
                                 onTap: () {
-                                  // Navigator.of(context)
-                                  //     .push(MaterialPageRoute(
-                                  //       builder: (context) =>
-                                  //           UpdateItemScreen(item: product),
-                                  //     ))
-                                  //     .then(
-                                  //       (context) => _apiCon.getItems(),
-                                  //     );
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => AddItem(
+                                          forEdit: true, toEditItem: product),
+                                    ),
+                                  );
                                 },
                                 leading: CircleAvatar(
                                   backgroundColor: Colors.transparent,
