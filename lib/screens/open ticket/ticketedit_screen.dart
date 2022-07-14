@@ -1,14 +1,13 @@
 import 'package:go_router/go_router.dart';
+import 'package:mypos/components/ticket_counter.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
 // import 'package:mypos/screen/item/edit_qty_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/ticket_item.dart';
 import 'package:mypos/screens/widgets/menu_items.dart';
-import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -32,35 +31,7 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Text(
-              'Ticket',
-              style: kAppBarText,
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Stack(
-              children: [
-                SvgPicture.asset(
-                  'assets/images/Ticket White.svg',
-                  color: Colors.black,
-                  height: 36,
-                  width: 27,
-                ),
-                Positioned(
-                  child: Text(
-                    '${Provider.of<TicketController>(context).ticketList.length}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  top: 8,
-                  left: 8,
-                ),
-              ],
-            ),
-          ],
-        ),
+        title: const TicketCounter(),
         elevation: 0,
         titleSpacing: 10,
         leading: GestureDetector(

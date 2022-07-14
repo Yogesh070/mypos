@@ -1,17 +1,16 @@
 import 'package:go_router/go_router.dart';
+import 'package:mypos/components/ticket_counter.dart';
 import 'package:mypos/controllers/category_controller.dart';
 import 'package:mypos/controllers/customer_controller.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/controllers/settings_controller.dart';
 import 'package:mypos/controllers/sidenav_controller.dart';
-import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/category.dart';
 import 'package:mypos/screens/home/components/items_grid_view.dart';
 import 'package:mypos/screens/home/components/items_listview.dart';
 import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/screens/open%20ticket/components/ticket_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/model/item.dart';
 import 'package:mypos/utils/addtocartanimation/add_to_cart_animation.dart';
@@ -193,36 +192,7 @@ class _HomepageState extends State<Homepage> {
                   onTap: () {
                     context.goNamed('ticket');
                   },
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Ticket',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Stack(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/images/Ticket White.svg',
-                            color: Colors.black,
-                            height: 36,
-                            width: 27,
-                          ),
-                          Positioned(
-                            key: gkItem,
-                            child: Text(
-                              '${Provider.of<TicketController>(context).bills.length}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            top: 8,
-                            left: 8,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                  child: TicketCounter(gkItem: gkItem),
                 ))
             : const CustomAppBar(),
         body: newHome(media),
