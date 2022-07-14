@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mypos/components/primary_button.dart';
 import 'package:mypos/controllers/addon_controller.dart';
 import 'package:mypos/controllers/product_controller.dart';
 import 'package:mypos/model/item.dart';
@@ -13,7 +14,6 @@ import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
 
 class AddItem extends StatefulWidget {
-  // const AddItem({Key? key}) : super(key: key);
   final Item? toEditItem;
   final bool? forEdit;
 
@@ -402,17 +402,17 @@ class _AddItemState extends State<AddItem> {
                     );
                   },
                 ),
-                Semantics(
-                  label: 'image_picker_example_from_gallery',
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      _onImageButtonPressed(ImageSource.gallery,
-                          context: context);
-                    },
-                    tooltip: 'Pick Image from gallery',
-                    child: const Icon(Icons.photo),
+                PrimaryButton(
+                  title: 'Upload Image',
+                  onPressed: () {
+                    _onImageButtonPressed(ImageSource.gallery,
+                        context: context);
+                  },
+                  icon: const Icon(
+                    Icons.photo,
+                    color: Colors.white,
                   ),
-                ),
+                )
               ],
             ),
           ),
