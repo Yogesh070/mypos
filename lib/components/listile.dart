@@ -36,16 +36,16 @@ class TileListBox extends StatelessWidget {
           ? Wrap(
               alignment: WrapAlignment.center,
               children: [
-                Transform.scale(
-                  scale: 0.7,
-                  child: Transform.translate(
-                    offset: const Offset(0, 4),
-                    child: Checkbox(
-                      value: isChecked,
-                      onChanged: chechBoxCallback,
-                    ),
-                  ),
-                ),
+                // Transform.scale(
+                //   scale: 0.7,
+                //   child: Transform.translate(
+                //     offset: const Offset(0, 4),
+                //     child: Checkbox(
+                //       value: isChecked,
+                //       onChanged: chechBoxCallback,
+                //     ),
+                //   ),
+                // ),
                 Container(
                   margin: const EdgeInsets.only(top: 5),
                   child: CircleAvatar(
