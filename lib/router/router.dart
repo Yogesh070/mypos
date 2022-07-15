@@ -17,6 +17,7 @@ import 'package:mypos/screens/customer/customer_screen.dart';
 import 'package:mypos/screens/home/home.dart';
 import 'package:mypos/screens/item/add_item.dart';
 import 'package:mypos/screens/item/itemlist_screen.dart';
+import 'package:mypos/screens/open%20ticket/ticket_details.dart';
 import 'package:mypos/screens/open%20ticket/ticketedit_screen.dart';
 import 'package:mypos/screens/open%20ticket/tickets_screen.dart';
 import 'package:mypos/screens/others/splash_screen.dart';
@@ -25,6 +26,7 @@ import 'package:mypos/screens/payment/payment_method.dart';
 import 'package:mypos/screens/profile/profile.dart';
 import 'package:mypos/screens/reciept/reciept_screen.dart';
 import 'package:provider/provider.dart';
+import '../utils//helper.dart';
 
 class DefaultRouter {
   static final GoRouter route = GoRouter(
@@ -147,11 +149,27 @@ class DefaultRouter {
                 ),
               ]),
           GoRoute(
-            name: 'open-ticket',
-            path: 'open-ticket',
-            builder: (BuildContext context, GoRouterState _goRouterState) =>
-                const TicketsScreen(),
-          ),
+              name: 'open-ticket',
+              path: 'open-ticket',
+              builder: (BuildContext context, GoRouterState _goRouterState) =>
+                  const TicketsScreen(),
+              routes: [
+                GoRoute(
+                  name: 'open-ticket-details',
+                  path: 'details/:tid',
+                  builder:
+                      (BuildContext context, GoRouterState _goRouterState) {
+                    final openTicket =
+                        Provider.of<TicketController>(context, listen: false)
+                            .getBillsFromHive()
+                            .firstWhere((element) =>
+                                element.id == _goRouterState.params['tid']!);
+                    return TicketDetail(
+                      openTicket: openTicket,
+                    );
+                  },
+                ),
+              ]),
           GoRoute(
             name: 'ticket',
             path: 'ticket',
@@ -163,11 +181,9 @@ class DefaultRouter {
                 path: 'pay',
                 builder: (BuildContext context, GoRouterState _goRouterState) =>
                     PaymentMethod(
-                  totalAmount: Provider.of<TicketController>(context,
-                          listen: false)
-                      .calculateTotal(
-                          Provider.of<TicketController>(context, listen: false)
-                              .ticketList),
+                  totalAmount: calculateTotal(
+                      Provider.of<TicketController>(context, listen: false)
+                          .ticketList),
                 ),
                 routes: [
                   GoRoute(
@@ -176,10 +192,8 @@ class DefaultRouter {
                       builder: (BuildContext context,
                               GoRouterState _goRouterState) =>
                           CashPayment(
-                            totalAmount: Provider.of<TicketController>(context,
-                                    listen: false)
-                                .calculateTotal(Provider.of<TicketController>(
-                                        context,
+                            totalAmount: calculateTotal(
+                                Provider.of<TicketController>(context,
                                         listen: false)
                                     .ticketList),
                           ),
@@ -191,7 +205,7 @@ class DefaultRouter {
                         //       CompleteActionPayment(
                         //                   totalAmount: totalAmount!,
                         //                   paidAmount: _amountController.text,
-                        //                 ),
+                        //                 ),x
                         // ),
                       ]),
                 ],
