@@ -9,6 +9,7 @@ import 'package:mypos/utils/boxes.dart';
 class TicketController extends ChangeNotifier {
   List<Bill> bills = [];
   List<Bill> openTickets = [];
+  int openTicketCount = 0;
 
   void addToBill(Bill bill) {
     bills.add(bill);
@@ -80,11 +81,18 @@ class TicketController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String calculateTotal(List<TicketItem> ticketItems) {
-    double total = 0;
-    for (var element in ticketItems) {
-      total = total + (element.item!.price * element.quantity);
+  void updateOpenTicketCount() {
+    openTicketCount = 0;
+    final billBox = Boxes.getBills();
+    for (var element in billBox.values) {
+      if (!element.isPaid!) {
+        openTicketCount++;
+      }
     }
-    return total.toString();
+  }
+
+  void incrementOpenTicketCount() {
+    openTicketCount++;
+    notifyListeners();
   }
 }
