@@ -10,6 +10,7 @@ import 'package:mypos/model/ticket_item.dart';
 import 'package:mypos/screens/widgets/menu_items.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import '../../utils/helper.dart';
 
 class TicketEditScreen extends StatefulWidget {
   const TicketEditScreen({Key? key}) : super(key: key);
@@ -107,7 +108,7 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                           .ticketList
                           .isEmpty
                       ? 'Rs. 0.0'
-                      : 'Rs. ${Provider.of<TicketController>(context, listen: false).calculateTotal(Provider.of<TicketController>(context, listen: false).ticketList)}',
+                      : 'Rs. ${calculateTotal(Provider.of<TicketController>(context, listen: false).ticketList)}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -144,6 +145,8 @@ class _TicketEditScreenState extends State<TicketEditScreen> {
                           .ticketList
                           .isNotEmpty) {
                         toAddBill.customer = null;
+                        Provider.of<TicketController>(context, listen: false)
+                            .incrementOpenTicketCount();
                         Provider.of<TicketController>(context, listen: false)
                             .addToBill(toAddBill);
                         if (Provider.of<CustomerController>(context,

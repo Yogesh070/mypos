@@ -1,12 +1,10 @@
-// ignore_for_file: unused_import
-
 import 'package:flutter/material.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
 import 'package:mypos/screens/home/components/sidemenu.dart';
 import 'package:mypos/screens/widgets/timeago.dart';
 import 'receiptdetails.dart';
-
+import '../../utils/helper.dart';
 import 'package:provider/provider.dart';
 
 class RecieptScreen extends StatefulWidget {
@@ -127,7 +125,7 @@ class BillCard extends StatelessWidget {
             style: const TextStyle(fontSize: 12, color: Colors.black),
           ),
           trailing: Text(
-            'Rs. ${Provider.of<TicketController>(context).calculateTotal(bill.items)}',
+            'Rs. ${calculateTotal(bill.items)}',
             style: const TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 14, color: Colors.black),
           ),

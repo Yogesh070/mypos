@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mypos/controllers/ticket_controller.dart';
 import 'package:mypos/model/bill.dart';
 import 'package:mypos/utils/constant.dart';
-import 'package:provider/provider.dart';
+import '../../utils/helper.dart';
 
 class ReceiptDetails extends StatelessWidget {
   final Bill bill;
@@ -113,8 +112,7 @@ class ReceiptDetails extends StatelessWidget {
           divider,
           CustomRow(
             label: 'Total',
-            trailing:
-                'Rs. ${Provider.of<TicketController>(context).calculateTotal(bill.items)}',
+            trailing: 'Rs. ${calculateTotal(bill.items)}',
           ),
           const CustomRow(
             label: 'Discount',
