@@ -162,8 +162,7 @@ class _HomepageState extends State<Homepage> {
                           //   ),
 
                           icon: Icon(
-                            Provider.of<CustomerController>(context,
-                                            listen: false)
+                            Provider.of<CustomerController>(context)
                                         .selectedCustomerForTicket ==
                                     null
                                 ? Icons.person_add_alt_1_sharp
