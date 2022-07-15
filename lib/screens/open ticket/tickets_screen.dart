@@ -3,7 +3,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mypos/components/listile.dart';
 import 'package:mypos/controllers/ticket_controller.dart';
-import 'package:mypos/model/bill.dart';
 import 'package:mypos/screens/widgets/timeago.dart';
 import 'package:mypos/utils/constant.dart';
 import 'package:provider/provider.dart';
@@ -17,16 +16,13 @@ class TicketsScreen extends StatefulWidget {
 }
 
 class _TicketsScreenState extends State<TicketsScreen> {
-  late List<Bill> _openTickets;
+  // late List<Bill> _openTickets;
   bool isLoadedOnce = false;
   @override
   void initState() {
     super.initState();
     if (!isLoadedOnce) {
-      _openTickets = Provider.of<TicketController>(context, listen: false)
-          .getBillsFromHive()
-          .where((element) => !element.isPaid!)
-          .toList();
+      Provider.of<TicketController>(context, listen: false).initOpenTicket();
       setState(() {
         isLoadedOnce = true;
       });
@@ -41,7 +37,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
         elevation: 0,
         titleSpacing: 10,
         title: Text(
-          'Open Ticket (${_openTickets.length})',
+          'Open Ticket (${Provider.of<TicketController>(context).openTickets.length})',
           style: kAppBarText,
         ),
         leading: GestureDetector(
@@ -112,73 +108,83 @@ class _TicketsScreenState extends State<TicketsScreen> {
           const Divider(
             thickness: 1,
           ),
-          Expanded(
-            child: AnimatedList(
-              initialItemCount: _openTickets.length,
-              itemBuilder: (context, index, animation) {
-                final openTicket = _openTickets[index];
-                return FadeTransition(
-                  opacity: animation,
-                  child: Slidable(
-                    endActionPane: ActionPane(
-                      extentRatio: 0.25,
-                      motion: const ScrollMotion(),
-                      children: [
-                        SlidableAction(
-                          autoClose: true,
-                          icon: Icons.delete,
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          label: 'Delete',
-                          onPressed: (context) {
-                            // _controller.dismisDelete(openTicket, index,
-                            //     _builtOpenTicket(_controller, index, context));
-                            // ScaffoldMessenger.of(context).showSnackBar(
-                            //   const SnackBar(
-                            //     duration: Duration(milliseconds: 600),
-                            //     content: Text('Ticket deleted Sucessfully'),
-                            //     backgroundColor: kDefaultGreen,
-                            //   ),
-                            // );
-                          },
+          (Provider.of<TicketController>(context).openTickets.isNotEmpty)
+              ? Expanded(
+                  child: AnimatedList(
+                    initialItemCount: Provider.of<TicketController>(context)
+                        .openTickets
+                        .length,
+                    itemBuilder: (context, index, animation) {
+                      final openTicket = Provider.of<TicketController>(context)
+                          .openTickets[index];
+                      return FadeTransition(
+                        opacity: animation,
+                        child: Slidable(
+                          endActionPane: ActionPane(
+                            extentRatio: 0.25,
+                            motion: const ScrollMotion(),
+                            children: [
+                              SlidableAction(
+                                autoClose: true,
+                                icon: Icons.delete,
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                label: 'Delete',
+                                onPressed: (context) {
+                                  Provider.of<TicketController>(context,
+                                          listen: false)
+                                      .deleteTicket(openTicket.id!);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(milliseconds: 600),
+                                      content:
+                                          Text('Ticket deleted Sucessfully'),
+                                      backgroundColor: kDefaultGreen,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(color: kBorderColor, width: 1),
+                            )),
+                            child: TileListBox(
+                              // merge: Text('Merge'),
+                              isChecked: false,
+                              // merge: _controller.openTicketList[index].ismerged == true
+                              //     ? const Padding(
+                              //         padding: EdgeInsets.all(4.0),
+                              //         child: Text('Merge'),
+                              //       )
+                              //     : null,
+                              // isChecked: openTicket.isChecked!,
+                              // chechBoxCallback: (val) {
+                              //   _controller.changeSwitchValue(index);
+                              // },
+                              onTap: () {
+                                context.goNamed(
+                                  'open-ticket-details',
+                                  params: {"tid": openTicket.id!},
+                                );
+                              },
+                              created:
+                                  TimeAgo.timeAgoSinceDate(openTicket.addedAt!),
+                              taxTitle: '${openTicket.id}',
+                              amount: 'Rs.${calculateTotal(openTicket.items)}',
+                              iconData: Icons.person,
+                            ),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          border: Border(
-                        bottom: BorderSide(color: kBorderColor, width: 1),
-                      )),
-                      child: TileListBox(
-                        // merge: Text('Merge'),
-                        isChecked: false,
-                        // merge: _controller.openTicketList[index].ismerged == true
-                        //     ? const Padding(
-                        //         padding: EdgeInsets.all(4.0),
-                        //         child: Text('Merge'),
-                        //       )
-                        //     : null,
-                        // isChecked: openTicket.isChecked!,
-                        // chechBoxCallback: (val) {
-                        //   _controller.changeSwitchValue(index);
-                        // },
-                        onTap: () {
-                          context.goNamed(
-                            'open-ticket-details',
-                            params: {"tid": openTicket.id!},
-                          );
-                        },
-                        created: TimeAgo.timeAgoSinceDate(openTicket.addedAt!),
-                        taxTitle: '${openTicket.id}',
-                        amount: 'Rs.${calculateTotal(openTicket.items)}',
-                        iconData: Icons.person,
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : const Center(
+                  child: Text("No Tickets"),
+                )
         ],
       ),
     );
