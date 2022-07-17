@@ -1,13 +1,8 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mypos/components/addtextfield.dart';
-import 'package:mypos/screens/payment/complete_payment.dart';
-// import 'package:mypos/controllers/product_controller.dart';
-// import 'package:mypos/controller/items_controller.dart';
 // import 'package:mypos/screen/split/splitoption.dart';
 import 'package:mypos/utils/constant.dart';
-// import 'package:provider/provider.dart';
 
 class CashPayment extends StatelessWidget {
   final String? totalAmount;
@@ -20,8 +15,6 @@ class CashPayment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // var _pay = Provider.of<SplitController>(context);
-    // var _itemsCon = Provider.of<ProductController>(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFFF),
@@ -65,11 +58,10 @@ class CashPayment extends StatelessWidget {
             children: [
               Center(
                 child: Padding(
-                  padding: EdgeInsets.all(7.0),
+                  padding: const EdgeInsets.all(7.0),
                   child: Text(
                     totalAmount!,
-                    // _itemsCon.total.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -132,24 +124,11 @@ class CashPayment extends StatelessWidget {
                   text: const Text('Confirm', style: kSemiLargeText),
                   onPress: () {
                     if (_formkey.currentState!.validate()) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CompleteActionPayment(
-                            totalAmount: totalAmount!,
-                            paidAmount: _amountController.text,
-                          ),
-                        ),
+                      context.goNamed(
+                        'complete',
+                        extra: _amountController.text,
                       );
                     }
-
-                    // if (_itemsCon.cashReceived.text.isNotEmpty &&
-                    //     _itemsCon.ticketList.isNotEmpty) {
-                    //   _itemsCon.performTransaction(context);
-                    //   _itemsCon.cashReceived.clear();
-                    // } else {
-                    //   debugPrint('amount not defined or items not added');
-                    // }
                   },
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 ),

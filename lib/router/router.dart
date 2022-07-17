@@ -22,6 +22,7 @@ import 'package:mypos/screens/open%20ticket/ticketedit_screen.dart';
 import 'package:mypos/screens/open%20ticket/tickets_screen.dart';
 import 'package:mypos/screens/others/splash_screen.dart';
 import 'package:mypos/screens/payment/cash_payment.dart';
+import 'package:mypos/screens/payment/complete_payment.dart';
 import 'package:mypos/screens/payment/payment_method.dart';
 import 'package:mypos/screens/profile/profile.dart';
 import 'package:mypos/screens/reciept/reciept_screen.dart';
@@ -187,27 +188,31 @@ class DefaultRouter {
                 ),
                 routes: [
                   GoRoute(
-                      name: 'cash',
-                      path: 'cash',
-                      builder: (BuildContext context,
-                              GoRouterState _goRouterState) =>
-                          CashPayment(
-                            totalAmount: calculateTotal(
-                                Provider.of<TicketController>(context,
-                                        listen: false)
-                                    .ticketList),
-                          ),
-                      routes: [
-                        //             GoRoute(
-                        //   name: 'complete',
-                        //   path: 'complete',
-                        //   builder: (BuildContext context, GoRouterState _goRouterState) =>
-                        //       CompleteActionPayment(
-                        //                   totalAmount: totalAmount!,
-                        //                   paidAmount: _amountController.text,
-                        //                 ),x
-                        // ),
-                      ]),
+                    name: 'cash',
+                    path: 'cash',
+                    builder:
+                        (BuildContext context, GoRouterState _goRouterState) =>
+                            CashPayment(
+                      totalAmount: calculateTotal(
+                          Provider.of<TicketController>(context, listen: false)
+                              .ticketList),
+                    ),
+                    routes: [
+                      GoRoute(
+                        name: 'complete',
+                        path: 'complete',
+                        builder: (BuildContext context,
+                                GoRouterState _goRouterState) =>
+                            CompleteActionPayment(
+                          totalAmount: calculateTotal(
+                              Provider.of<TicketController>(context,
+                                      listen: false)
+                                  .ticketList),
+                          paidAmount: _goRouterState.extra as String,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ],
