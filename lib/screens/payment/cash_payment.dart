@@ -88,16 +88,16 @@ class CashPayment extends StatelessWidget {
                 textEditingController: _amountController,
                 keyboardType: TextInputType.number,
                 validator: (val) {
-                  if (int.tryParse(val!) == null) {
-                    return "Invalid value";
+                  if (double.tryParse(val!) == null || val.isEmpty) {
+                    return 'Enter Valid Price';
                   }
-                  if (val.isNotEmpty) {
-                    if (int.parse(val) <= 0) {
-                      return 'Enter Valid Amount';
-                    } else if (int.parse(val) < int.parse(totalAmount!)) {
-                      return 'Cannot Pay less amount than amount to be paid';
-                    }
+
+                  if (double.parse(val) <= 0) {
+                    return 'Enter Valid Amount';
+                  } else if (double.parse(val) < double.parse(totalAmount!)) {
+                    return 'Cannot pay less amount than amount to be paid';
                   }
+
                   return null;
                 },
               ),

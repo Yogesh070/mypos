@@ -79,7 +79,8 @@ class CompleteActionPayment extends StatelessWidget {
                       ),
                       Expanded(
                         child: CustomColumn(
-                          rate: (int.parse(paidAmount) - int.parse(totalAmount))
+                          rate: (double.parse(paidAmount) -
+                                  double.parse(totalAmount))
                               .toString(),
                           title: 'Change',
                         ),
